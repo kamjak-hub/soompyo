@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숨:표 (Breath Mark) - 상황별 맞춤 호흡</title>
+    <script>
+        // Tailwind CDN의 프로덕션 경고 메시지 숨김 처리
+        (function () {
+            const origWarn = console.warn;
+            console.warn = function (...args) {
+                if (typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+                origWarn.apply(console, args);
+            };
+        })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <style>
+        :root {
+            --breath-ease: cubic-bezier(0.37, 0, 0.63, 1);
+            --deflate-ease: cubic-bezier(0.34, 1.3, 0.64, 1);
+            --bg: #faf5ee;
+            --surface: #ffffff;
+            --ink: #3b2c1f;
+            --ink-soft: #93816e;
+            --primary: #ff8a4c;
+            --primary-deep: #f4702e;
+            --line: #4a3728;
+            --skin: #f6dfc8;
+            --soft-shadow: 0 10px 30px rgba(59, 44, 31, 0.08);
+            --soft-shadow-lg: 0 18px 44px rgba(59, 44, 31, 0.12);
+        }
+
+        body {
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--ink);
+            overflow-x: hidden;
+            touch-action: manipulation;
+            letter-spacing: -0.01em;
+        }
+
+        /* ─────────── 워드마크: 숨:표 (콜론이 숨쉬는 시그니처) ─────────── */
+        .wordmark {
+            display: inline-flex;
+            align-items: center;
+            font-size: 2.4rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+        }
+        .mark-colon {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 7px;
+            margin: 0 8px;
+        }
+        .mark-colon i {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff8a4c, #ffb067);
+            animation: dotBreath 3.4s var(--breath-ease) infinite;
+        }
+        .mark-colon i:last-child { animation-delay: 0.5s; }
+        @keyframes dotBreath {
+            0%, 100% { transform: scale(1); }
+            45% { transform: scale(1.4); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .mark-colon i { animation: none; }
+        }
+
+        /* ─────────── 카드 & 컴포넌트 (소프트 모던) ─────────── */
+        .soft-card {
+            background: var(--surface);
+            border: 1px solid rgba(59, 44, 31, 0.06);
+            border-radius: 28px;
+            box-shadow: var(--soft-shadow);
+        }
+
+        .persona-card {
+            background: var(--surface);
+            border: 1px solid rgba(59, 44, 31, 0.06);
+            border-radius: 24px;
+            box-shadow: var(--soft-shadow);
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s;
+        }
+        .persona-card:hover { transform: translateY(-4px); box-shadow: var(--soft-shadow-lg); }
+        .persona-card:active { transform: translateY(0) scale(0.985); }
+
+        .emoji-chip {
+            width: 58px;
+            height: 58px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            flex: none;
+        }
+
+        .cta-btn {
+            background: linear-gradient(135deg, #ff8a4c, #ffb067);
+            color: #fff;
+            font-weight: 800;
+            border-radius: 999px;
+            box-shadow: 0 10px 24px rgba(255, 138, 76, 0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .cta-btn:hover { box-shadow: 0 14px 30px rgba(255, 138, 76, 0.5); }
+        .cta-btn:active { transform: scale(0.97); box-shadow: 0 6px 14px rgba(255, 138, 76, 0.35); }
+
+        .icon-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(59, 44, 31, 0.08);
+            box-shadow: var(--soft-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            transition: transform 0.15s;
+        }
+        .icon-btn:active { transform: scale(0.92); }
+
+        /* ─────────── 캐릭터 (왼쪽) + 흐름 그래프 (오른쪽) ─────────── */
+        .character-container {
+            position: relative;
+            width: 100%;
+            min-height: 290px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .mallang-stage {
+            position: relative;
+            flex: none;
+            margin-left: -30px;
+        }
+
+        .mallang-body {
+            position: relative;
+            width: 225px;
+            height: 200px;
+            background: var(--skin);
+            border: 5px solid var(--line);
+            border-radius: 46% 46% 50% 50%;
+        }
+
+        .ear {
+            position: absolute;
+            top: -20px;
+            width: 54px;
+            height: 54px;
+            background: var(--skin);
+            border: 5px solid var(--line);
+            border-radius: 50%;
+        }
+        .ear::after {
+            content: '';
+            position: absolute;
+            inset: 11px;
+            background: #ffb9c2;
+            border-radius: 50%;
+            opacity: 0.75;
+        }
+        .ear-l { left: 16px; }
+        .ear-r { right: 16px; }
+
+        .eye {
+            position: absolute;
+            top: 44px;
+            width: 15px;
+            height: 17px;
+            background: var(--line);
+            border-radius: 50%;
+            animation: blink 4.5s infinite;
+            transform-origin: center;
+        }
+        .eye-l { left: 30%; }
+        .eye-r { right: 30%; }
+        @keyframes blink {
+            0%, 92%, 100% { transform: scaleY(1); }
+            95%, 97% { transform: scaleY(0.1); }
+        }
+
+        .cheek {
+            position: absolute;
+            top: 58px;
+            width: 26px;
+            height: 15px;
+            background: #ff9fb0;
+            border-radius: 50%;
+            opacity: 0.55;
+            filter: blur(1px);
+        }
+        .cheek-l { left: 16%; }
+        .cheek-r { right: 16%; }
+
+        .mouth {
+            position: absolute;
+            top: 72px;
+            left: 50%;
+            translate: -50% 0;
+            width: 13px;
+            height: 10px;
+            background: #fff;
+            border: 3.5px solid var(--line);
+            border-radius: 50%;
+            transition: all 0.4s ease;
+            z-index: 3;
+        }
+        .inhaling .mouth { width: 18px; height: 18px; }
+        .holding .mouth { width: 20px; height: 4px; background: var(--line); border: none; border-radius: 99px; }
+        .exhaling .mouth { width: 11px; height: 15px; border-radius: 45% 45% 50% 50%; }
+
+        .chest-patch {
+            position: absolute;
+            bottom: 96px;
+            left: 50%;
+            width: 122px;
+            height: 46px;
+            background: linear-gradient(to bottom, #fcebd6, #f9e1c6);
+            border: 3px solid rgba(74, 55, 40, 0.25);
+            border-radius: 50%;
+            transform: translateX(-50%) scale(1);
+            transform-origin: 50% 100%;
+            transition-property: transform;
+            z-index: 1;
+        }
+
+        .tummy {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            width: 128px;
+            height: 90px;
+            background: #fffdf6;
+            border: 3px solid rgba(74, 55, 40, 0.2);
+            border-radius: 50%;
+            box-shadow: inset 0 -6px 0 rgba(74, 55, 40, 0.05);
+            transform: translateX(-50%) scale(1);
+            transform-origin: 50% 80%;
+            transition-property: transform;
+            z-index: 2;
+        }
+        .tummy::after {
+            content: '';
+            position: absolute;
+            top: 46%;
+            left: 50%;
+            translate: -50% 0;
+            width: 10px;
+            height: 5px;
+            border-bottom: 3px solid rgba(74, 55, 40, 0.25);
+            border-radius: 50%;
+        }
+
+        .arm {
+            position: absolute;
+            width: 34px;
+            height: 52px;
+            background: var(--skin);
+            border: 5px solid var(--line);
+            border-radius: 99px;
+            top: 102px;
+            z-index: 5;
+        }
+        .arm-l { left: 12px; transform: rotate(38deg); }
+        .arm-r { right: 12px; transform: rotate(-38deg); }
+
+        .foot {
+            position: absolute;
+            bottom: -10px;
+            width: 48px;
+            height: 28px;
+            background: var(--skin);
+            border: 5px solid var(--line);
+            border-radius: 50%;
+            z-index: 6;
+        }
+        .foot-l { left: 34px; rotate: 8deg; }
+        .foot-r { right: 34px; rotate: -8deg; }
+
+        .puff-layer {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            width: 0;
+            height: 0;
+            z-index: 40;
+            pointer-events: none;
+        }
+        .puff {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid rgba(74, 55, 40, 0.25);
+            border-radius: 50%;
+            animation: puffFloat var(--puff-dur, 2.5s) ease-out forwards;
+        }
+        @keyframes puffFloat {
+            0%   { opacity: 0; transform: translate(6px, 0) scale(0.3); }
+            15%  { opacity: 1; }
+            100% { opacity: 0; transform: translate(var(--puff-x, 60px), var(--puff-y, -50px)) scale(1.4); }
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 22px;
+            animation: heartUp 1.8s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes heartUp {
+            0%   { opacity: 0; transform: translateY(10px) scale(0.4); }
+            20%  { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-90px) scale(1.2) rotate(var(--h-rot, 10deg)); }
+        }
+
+        .tri-guide { flex: none; }
+
+        @media (max-width: 560px) {
+            .mallang-stage { transform: scale(0.72); transform-origin: left center; margin: -26px -50px -26px -34px; }
+            .tri-guide { transform: scale(0.8); transform-origin: left center; margin-right: -56px; }
+            .character-container { gap: 0; }
+        }
+
+        /* 말풍선 (소프트) */
+        .speech-bubble {
+            position: relative;
+            background: var(--surface);
+            border: 1px solid rgba(59, 44, 31, 0.06);
+            border-radius: 20px;
+            padding: 13px 26px;
+            margin-bottom: 22px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            text-align: center;
+            box-shadow: var(--soft-shadow);
+        }
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            width: 18px;
+            height: 18px;
+            background: var(--surface);
+            border-right: 1px solid rgba(59, 44, 31, 0.06);
+            border-bottom: 1px solid rgba(59, 44, 31, 0.06);
+            transform: translateX(-50%) rotate(45deg);
+        }
+        .bubble-pop { animation: bubblePop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes bubblePop {
+            0% { transform: scale(0.94); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .step-swap { animation: stepSwap 0.4s ease; }
+        @keyframes stepSwap {
+            0% { transform: translateY(8px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .mood-btn {
+            font-size: 28px;
+            background: var(--surface);
+            border: 1px solid rgba(59, 44, 31, 0.08);
+            border-radius: 18px;
+            padding: 9px 13px;
+            box-shadow: var(--soft-shadow);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .mood-btn:hover { transform: translateY(-3px); box-shadow: var(--soft-shadow-lg); }
+        .mood-btn:active { transform: scale(0.94); }
+
+        .side-chip {
+            font-weight: 800;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(59, 44, 31, 0.08);
+            border-radius: 999px;
+            padding: 9px 17px;
+            box-shadow: var(--soft-shadow);
+            white-space: nowrap;
+        }
+
+        .chart-box {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(59, 44, 31, 0.07);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #34d399, #6ee7b7);
+            border-radius: 99px;
+            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        #session-overlay {
+            transition: background 0.8s ease, transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* 매뉴얼 아코디언 (소프트) */
+        details.manual-item {
+            background: var(--surface);
+            border: 1px solid rgba(59, 44, 31, 0.06);
+            border-radius: 22px;
+            box-shadow: var(--soft-shadow);
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        details.manual-item[open] { box-shadow: var(--soft-shadow-lg); }
+        details.manual-item summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 18px 22px;
+            font-size: 1.08rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        details.manual-item summary::-webkit-details-marker { display: none; }
+        details.manual-item summary::after {
+            content: '▾';
+            font-size: 15px;
+            color: var(--ink-soft);
+            transition: transform 0.2s;
+        }
+        details.manual-item[open] summary::after { transform: rotate(180deg); }
+        details.manual-item .manual-body {
+            padding: 0 22px 20px;
+            font-weight: 600;
+            line-height: 1.75;
+            color: #6f5f4e;
+        }
+        .manual-tag {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 800;
+            border-radius: 999px;
+            padding: 4px 12px;
+            margin-right: 6px;
+            background: #fff1e5;
+            color: var(--primary-deep);
+        }
+
+        /* 검색 입력 */
+        .search-input {
+            width: 100%;
+            padding: 20px 64px 20px 26px;
+            background: var(--surface);
+            border: 1px solid rgba(59, 44, 31, 0.08);
+            border-radius: 999px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            outline: none;
+            box-shadow: var(--soft-shadow);
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        .search-input::placeholder { color: #c4b6a5; font-weight: 600; }
+        .search-input:focus {
+            border-color: rgba(255, 138, 76, 0.5);
+            box-shadow: 0 0 0 4px rgba(255, 138, 76, 0.15), var(--soft-shadow);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .eye { animation: none !important; }
+        }
+        @keyframes pulse-red {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+        }
+        .animate-pulse-red {
+            animation: pulse-red 1.5s infinite;
+            background: linear-gradient(135deg, #ef4444, #f87171) !important;
+        }
+
+        /* 앰비언트 사운드 칩 */
+        .asmr-chip {
+            padding: 10px 4px;
+            font-size: 14px;
+            font-weight: 800;
+            border-radius: 14px;
+            border: 1px solid rgba(59, 44, 31, 0.08);
+            background: var(--surface);
+            transition: all 0.2s;
+            text-align: center;
+            cursor: pointer;
+        }
+        .asmr-chip:hover {
+            transform: translateY(-1px);
+        }
+        .asmr-chip.active {
+            background: linear-gradient(135deg, #ff8a4c, #ffb067);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(255, 138, 76, 0.25);
+        }
+
+        /* 하단 내비게이션 */
+        .nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--ink-soft);
+            transition: color 0.2s, transform 0.1s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 12px;
+        }
+        .nav-tab:active {
+            transform: scale(0.95);
+        }
+        .nav-tab.active {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body class="p-0 m-0 overflow-x-hidden">
+
+    <div id="app" class="max-w-2xl mx-auto min-h-screen flex flex-col relative pb-20">
+
+        <!-- 히어로 헤더 -->
+        <header class="px-7 pt-10 pb-2">
+            <div class="flex items-end justify-between mb-2">
+                <div>
+                    <div class="wordmark">
+                        숨<span class="mark-colon"><i></i><i></i></span>표
+                    </div>
+                    <p class="text-xs font-bold tracking-[0.25em] text-[#c4b6a5] mt-1 ml-1">BREATH MARK</p>
+                </div>
+                <div class="text-4xl mb-1">🧘‍♂️</div>
+            </div>
+            <p class="text-[15px] font-semibold text-[#93816e] mb-7 ml-1">숨을 고르는 시간, 마음에 찍는 쉼표</p>
+
+            <!-- 기분 입력 -->
+            <div class="relative">
+                <input id="mood-input" type="text" placeholder="기분을 입력하세요 (예: 화나, 긴장돼, 잠이 안 와)" class="search-input" style="padding-right: 120px;">
+                <div class="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                    <button id="mic-btn" onclick="startVoiceRecognition()" title="음성으로 입력"
+                        class="w-12 h-12 rounded-full flex items-center justify-center text-xl cta-btn">🎤</button>
+                    <button id="search-btn" onclick="submitSearch()" title="검색 및 이동"
+                        class="w-12 h-12 rounded-full flex items-center justify-center text-xl cta-btn">➡️</button>
+                </div>
+            </div>
+            <p class="mt-2.5 ml-4 text-[13px] font-semibold text-[#c4b6a5]"><span class="text-[#ff8a4c] font-bold">Enter</span>를 누르면 딱 맞는 호흡법으로 바로 이동해요</p>
+
+            <div id="search-miss" class="mt-5 hidden">
+                <div class="soft-card !rounded-2xl p-4">
+                    <p class="text-sm font-bold text-[#93816e]">딱 맞는 호흡을 못 찾았어요 🥲 '불안', '화나', '잠', '답답' 처럼 입력해보세요.</p>
+                </div>
+            </div>
+        </header>
+
+        <main id="home-content" class="px-7 pt-8 space-y-12">
+            <!-- 매일 하면 몸에 좋은 건강 호흡 -->
+            <section>
+                <h2 class="text-xl font-extrabold mb-5 flex items-center gap-2">
+                    <span class="w-1.5 h-6 rounded-full bg-gradient-to-b from-[#ff8a4c] to-[#ffb067]"></span>
+                    매일 하면 몸에 좋은 건강 호흡
+                </h2>
+                <div id="health-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </section>
+
+            <!-- 마음을 달래는 상황별 호흡 -->
+            <section>
+                <h2 class="text-xl font-extrabold mb-5 flex items-center gap-2">
+                    <span class="w-1.5 h-6 rounded-full bg-gradient-to-b from-[#ff8a4c] to-[#ffb067]"></span>
+                    마음을 달래는 상황별 호흡
+                </h2>
+                <div id="persona-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </section>
+
+            <!-- 나의 안정 변화 그래프 -->
+            <section class="soft-card p-8">
+                <h2 class="text-xl font-extrabold mb-2">📈 나의 안정 변화 그래프</h2>
+                <p class="text-[#93816e] text-[15px] font-semibold mb-1 leading-relaxed">
+                    호흡 전과 후, 내가 직접 고른 마음 상태(😖~😌)를 비교하는 <span class="text-[#f4702e] font-extrabold">나만의 기록</span>이에요.
+                </p>
+                <p class="text-[#93816e] text-[15px] font-semibold mb-6 leading-relaxed">
+                    <span class="inline-block w-3 h-3 rounded-[4px] bg-gray-300 mr-1 align-middle"></span>호흡 전보다
+                    <span class="inline-block w-3 h-3 rounded-[4px] bg-emerald-400 ml-2 mr-1 align-middle"></span>호흡 후 막대가 높아질수록, 마음이 안정되고 있다는 뜻이에요!
+                </p>
+                <div id="calm-empty" class="text-center py-10 text-[#c4b6a5] font-extrabold text-lg">
+                    아직 기록이 없어요 🌱<br>
+                    <span class="text-sm font-semibold">호흡을 하나 완료하면 전/후 마음 상태가 여기에 쌓여요.</span>
+                </div>
+                <div class="chart-box hidden" id="calm-chart-box">
+                    <canvas id="calmChart"></canvas>
+                </div>
+            </section>
+        </main>
+
+        <!-- 앰비언트 사운드 (ASMR) (별도 탭) -->
+        <main id="asmr-content" class="px-7 pt-8 space-y-12 pb-24 hidden">
+            <section class="text-center py-6">
+                <div class="inline-block p-4 bg-orange-50 rounded-full text-4xl mb-4 text-[#ff8a4c] animate-pulse">🎧</div>
+                <h2 class="text-2xl font-extrabold mb-2">앰비언트 사운드 (ASMR)</h2>
+                <p class="text-[#93816e] text-[15px] font-semibold leading-relaxed max-w-md mx-auto">
+                    호흡은 시각뿐만 아니라 청각과 결합했을 때 효과가 극대화됩니다. 마음에 평온을 더해줄 배경음을 골라보세요.
+                </p>
+            </section>
+
+            <!-- ASMR 컨트롤러 카드 -->
+            <section class="soft-card p-8 bg-gradient-to-r from-[#fffbf4] to-[#fffefc] border-l-4 !border-l-[#ff8a4c]">
+                <div class="flex items-center justify-between mb-6">
+                    <span class="text-sm font-extrabold text-[#93816e]" id="asmr-status">꺼짐</span>
+                    <span class="text-xs font-bold text-[#c4b6a5]">실시간 입체 음향</span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <button onclick="toggleAsmr('none')" id="asmr-none" class="asmr-chip active flex items-center justify-center gap-2 py-4">
+                        <span>🔇</span> 끄기
+                    </button>
+                    <button onclick="toggleAsmr('rain')" id="asmr-rain" class="asmr-chip flex items-center justify-center gap-2 py-4">
+                        <span>🌧️</span> 빗소리
+                    </button>
+                    <button onclick="toggleAsmr('wave')" id="asmr-wave" class="asmr-chip flex items-center justify-center gap-2 py-4">
+                        <span>🌊</span> 파도 소리
+                    </button>
+                    <button onclick="toggleAsmr('forest')" id="asmr-forest" class="asmr-chip flex items-center justify-center gap-2 py-4">
+                        <span>🌲</span> 숲소리
+                    </button>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center text-xs text-[#93816e] font-extrabold">
+                        <span>배경음 볼륨</span>
+                        <span id="asmr-vol-text">30%</span>
+                    </div>
+                    <input type="range" id="asmr-vol" min="0" max="0.8" step="0.05" value="0.3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#ff8a4c]" oninput="changeAsmrVol(this.value)">
+                </div>
+            </section>
+
+            <!-- 명상 팁 카드 -->
+            <section class="soft-card p-6 bg-[#faf5ee] border border-dashed border-[#e2d8ca]">
+                <h4 class="font-extrabold text-[15px] mb-2">💡 사운드 활용 Tip</h4>
+                <ul class="text-[13.5px] font-semibold text-[#93816e] space-y-2 list-disc list-inside">
+                    <li>빗소리는 깊은 생각에 몰입하거나 잠을 잘 때 좋습니다.</li>
+                    <li>파도 소리는 들숨과 날숨의 리듬을 파도의 출렁임과 맞춰보세요.</li>
+                    <li>숲소리는 활기찬 아침이나 머리를 식히고 싶을 때 효과적입니다.</li>
+                </ul>
+            </section>
+        </main>
+
+        <!-- 사용법 & 호흡법 매뉴얼 (별도 탭) -->
+        <main id="manual-content" class="px-7 pt-8 space-y-12 pb-24 hidden">
+            <!-- 과학적 원리 가이드 -->
+            <section class="soft-card p-8 bg-gradient-to-br from-[#ecfdf5] to-[#f0fdf4] border-l-4 !border-l-emerald-500">
+                <h2 class="text-xl font-extrabold text-emerald-800 mb-3 flex items-center gap-2">
+                    🧠 과학적 원리 가이드 (The Science of Breath)
+                </h2>
+                <p class="text-sm font-semibold text-emerald-700 leading-relaxed mb-4">
+                    숨표의 모든 호흡법은 단순한 휴식이 아닙니다. 과학적으로 증명된 우리 몸의 물리적 반응을 유도합니다.
+                </p>
+                <div class="space-y-4 text-emerald-900 text-[14.5px] font-medium leading-relaxed">
+                    <div class="flex gap-3">
+                        <span class="text-lg">⚡</span>
+                        <p>
+                            <b>미주신경(Vagus Nerve) 자극:</b> 호흡을 천천히 들이마시고 내쉬는 리듬은 뇌에 연결된 미주신경을 부드럽게 자극합니다. 이는 신체의 브레이크 역할을 하는 <b>부교감 신경계(Parasympathetic Nervous System)</b>를 활성화합니다.
+                        </p>
+                    </div>
+                    <div class="flex gap-3">
+                        <span class="text-lg">📉</span>
+                        <p>
+                            <b>즉각적인 혈압 및 심박수 감소:</b> 특히 날숨을 들숨보다 길게 내쉬는 호흡법(예: 욱하는 마음 가라앉히기, 4-4-8 호흡 등)은 심장 복귀 혈류량을 줄이고, 뇌의 혈압 감지 수용체를 활성화하여 <b>몇 초 만에 심박수와 혈압을 낮춰줍니다.</b>
+                        </p>
+                    </div>
+                    <div class="flex gap-3">
+                        <span class="text-lg">🔬</span>
+                        <p>
+                            <b>이산화탄소 내성 강화:</b> 숨을 의도적으로 참거나 느리게 쉬는 훈련은 혈액 내 이산화탄소 수치를 안정되게 유지시켜, 작은 스트레스 상황에서도 숨이 가빠지거나 불안해지는 현상을 물리적으로 예방합니다.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 사용법 및 호흡 리스트 -->
+            <section>
+                <h2 class="text-xl font-extrabold mb-5 flex items-center gap-2">
+                    <span class="w-1.5 h-6 rounded-full bg-gradient-to-b from-[#ff8a4c] to-[#ffb067]"></span>
+                    사용법 & 호흡법 매뉴얼
+                </h2>
+
+                <details class="manual-item mb-4" open>
+                    <summary>🧭 앱 사용법</summary>
+                    <div class="manual-body">
+                        ① 위 입력창에 기분을 적거나(🎤 음성도 가능) Enter를 눌러 추천 호흡으로 이동해요. 카드를 직접 골라도 좋아요.<br>
+                        ② 시작 전 지금 마음 상태(😖~😌)를 하나 골라주세요.<br>
+                        ③ '호흡 시작'을 누르고, 오른쪽 도형을 따라 함께 숨을 쉬어요. 선이 움직이는 속도가 곧 숨의 속도예요.<br>
+                        ④ 4회 반복이 끝나면 다시 마음 상태를 골라요. 전/후 변화가 '나의 안정 변화 그래프'에 기록돼요.
+                    </div>
+                </details>
+
+                <div id="manual-list" class="space-y-4"></div>
+            </section>
+        </main>
+
+        <!-- 하단 내비게이션 바 -->
+        <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl bg-white/80 backdrop-blur-md border-t border-gray-100 flex items-center justify-around py-3 px-4 z-40 shadow-lg">
+            <button onclick="switchTab('home')" id="tab-home" class="nav-tab active">
+                <span class="text-xl">🏠</span>
+                <span class="text-xs font-bold mt-1">홈</span>
+            </button>
+            <button onclick="switchTab('asmr')" id="tab-asmr" class="nav-tab">
+                <span class="text-xl">🎧</span>
+                <span class="text-xs font-bold mt-1">앰비언트</span>
+            </button>
+            <button onclick="switchTab('manual')" id="tab-manual" class="nav-tab">
+                <span class="text-xl">📖</span>
+                <span class="text-xs font-bold mt-1">사용법 & 매뉴얼</span>
+            </button>
+        </nav>
+
+        <!-- 호흡 세션 레이어 -->
+        <div id="session-overlay" class="fixed inset-0 z-50 translate-y-full flex flex-col p-7 overflow-hidden" style="background: #faf5ee;">
+
+            <div class="flex justify-between items-center mb-5">
+                <div class="text-left">
+                    <h2 id="session-title" class="text-[22px] font-extrabold leading-tight">모드 이름</h2>
+                    <p id="session-method" class="text-[15px] font-bold text-[#93816e]">호흡법 명칭</p>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <button id="sound-btn" onclick="toggleSound()" class="icon-btn">🔊</button>
+                    <button onclick="closeSession()" class="icon-btn font-black">✕</button>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <div class="flex justify-between mb-2">
+                    <span class="text-sm font-extrabold text-[#93816e]">현재 진행률</span>
+                    <span id="progress-text" class="text-sm font-extrabold">0%</span>
+                </div>
+                <div class="progress-container">
+                    <div id="progress-fill" class="progress-bar"></div>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col items-center justify-center relative">
+
+                <div id="msg-bubble" class="speech-bubble">준비되셨나요?</div>
+
+                <div id="mood-check" class="flex gap-3 mb-4 hidden">
+                    <button class="mood-btn" onclick="pickMood(1)">😖</button>
+                    <button class="mood-btn" onclick="pickMood(2)">😕</button>
+                    <button class="mood-btn" onclick="pickMood(3)">😐</button>
+                    <button class="mood-btn" onclick="pickMood(4)">🙂</button>
+                    <button class="mood-btn" onclick="pickMood(5)">😌</button>
+                </div>
+
+                <div class="character-container">
+                    <div id="mallang-stage" class="mallang-stage">
+                        <div id="puff-layer" class="puff-layer"></div>
+                        <div id="mallang-body" class="mallang-body">
+                            <div class="ear ear-l"></div>
+                            <div class="ear ear-r"></div>
+                            <div class="eye eye-l"></div>
+                            <div class="eye eye-r"></div>
+                            <div class="cheek cheek-l"></div>
+                            <div class="cheek cheek-r"></div>
+                            <div id="mouth" class="mouth"></div>
+                            <div id="visual-chest" class="chest-patch"></div>
+                            <div id="visual-belly" class="tummy"></div>
+                            <div class="arm arm-l"></div>
+                            <div class="arm arm-r"></div>
+                            <div class="foot foot-l"></div>
+                            <div class="foot foot-r"></div>
+                        </div>
+                    </div>
+
+                    <canvas id="tri-canvas" class="tri-guide"></canvas>
+                </div>
+
+                <div class="mt-6 flex items-center justify-center gap-4 w-full">
+                    <span id="focus-badge" class="side-chip">🎈 배호흡</span>
+                    <div class="text-center min-w-[130px]">
+                        <div id="current-step" class="text-2xl font-extrabold text-[#f4702e] mb-1">대기</div>
+                        <div id="step-timer" class="text-7xl font-black leading-none tracking-tight">0</div>
+                    </div>
+                    <span id="cycle-badge" class="side-chip">0 / 4회</span>
+                </div>
+            </div>
+
+            <button id="session-btn" onclick="toggleBreathing()" class="cta-btn w-full py-5 text-xl mt-4">
+                호흡 시작
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const personas = [
+            // ───────────────── 건강 호흡 ─────────────────
+            {
+                id: 'resonance',
+                category: 'health',
+                title: '5-5 공명 호흡 (자율신경 균형)',
+                emoji: '🌱',
+                desc: '심장 박동과 호흡 리듬을 일치시킵니다',
+                keywords: ['공명', '건강', '노화', '자율신경', '균형', '안정', '매일', '면역', '체력', '회복'],
+                method: '5-5 공명 호흡',
+                bg: '#ecfdf5',
+                focus: 'belly',
+                benefit: '심장 박동과 호흡 리듬을 일치시켜 자율신경계를 가장 안정적인 상태로 만듭니다. 꾸준히 하면 노화 방지와 면역력 강화에 탁월합니다.',
+                cycle: [
+                    {type: '천천히 마셔요', sec: 5, phase: 'in',  msg: '5초 동안 배를 부풀리며 코로 깊게 마셔요'},
+                    {type: '부드럽게 뱉어요', sec: 5, phase: 'out', msg: '5초 동안 온몸의 긴장을 풀며 입으로 내쉬어요'}
+                ]
+            },
+            {
+                id: 'morning-energy',
+                category: 'health',
+                title: '모닝 에너지 호흡 (세포 깨우기)',
+                emoji: '☀️',
+                desc: '뇌와 근육에 활력 가득한 에너지 충전',
+                keywords: ['아침', '에너지', '세포', '커피', '활력', '잠깨기', '피곤', '피로', '기상', '오전', '졸려'],
+                method: '4-2-4 활력 호흡',
+                bg: '#fff9e6',
+                focus: 'chest',
+                benefit: '뇌와 온몸에 풍부한 산소를 신속하게 공급해 신체 온도를 높이고 아침잠을 깨우는 데 탁월한 호흡입니다.',
+                cycle: [
+                    {type: '깊게 마셔요', sec: 4, phase: 'in',   msg: '가슴 가득 활기찬 공기를 들이마셔요!'},
+                    {type: '잠시 머금어요', sec: 2, phase: 'hold', msg: '산소가 온몸으로 전해집니다'},
+                    {type: '힘차게 뱉어요', sec: 4, phase: 'out',  msg: '이산화탄소를 힘차게 뿜어내며 날숨'}
+                ]
+            },
+            {
+                id: 'lung-capacity',
+                category: 'health',
+                title: '폐활량 강화 호흡 (심폐 지구력)',
+                emoji: '🫁',
+                desc: '가슴과 배를 동시에 확장하여 폐 전체 활성화',
+                keywords: ['폐활량', '강화', '심폐', '지구력', '달리기', '유산소', '운동', '가슴', '배', '산소'],
+                method: '6-4-6 완전 호흡',
+                bg: '#f0f9ff',
+                focus: 'belly',
+                benefit: '배와 가슴을 모두 확장하여 폐포 구석구석까지 신선한 공기를 순환시킵니다. 심폐 기능 강화와 가슴이 답답할 때 아주 효과적입니다.',
+                cycle: [
+                    {type: '가득 채우며 마셔요', sec: 6, phase: 'in',   msg: '배부터 가슴까지 폐 전체를 가득 채웁니다'},
+                    {type: '폐를 확장해 멈춰요', sec: 4, phase: 'hold', msg: '충만해진 공기를 폐 속에 머금으세요'},
+                    {type: '길고 고르게 비워내요', sec: 6, phase: 'out',  msg: '가슴부터 배 순서로 끝까지 완전히 내쉽니다'}
+                ]
+            },
+            // ───────────────── 상황별 호흡 ─────────────────
+            {
+                id: 'angry-child',
+                category: 'mind',
+                title: '화난 아이 달래기',
+                emoji: '🧸',
+                desc: '속상한 마음을 배 속에 빵빵하게!',
+                keywords: ['화나', '짜증', '아이', '울음', '떼쓰기', '화남', '속상'],
+                method: '풍선 복식 호흡',
+                bg: '#fff9e6',
+                focus: 'belly',
+                benefit: '풍선 불기 상상으로 흥분한 마음을 가라앉히고, 아이도 쉽게 따라 하는 복식 호흡 습관을 만들어요.',
+                cycle: [
+                    {type: '코로 마셔요', sec: 5, phase: 'in',   msg: '예쁜 꽃향기를 배 속에 가득 채워요!'},
+                    {type: '잠시 멈춰요', sec: 3, phase: 'hold', msg: '좋은 기분을 간직해요'},
+                    {type: '입으로 뱉어요', sec: 8, phase: 'out',  msg: '속상한 기분을 멀리 후~ 날려요'}
+                ]
+            },
+            {
+                id: 'volatile-anger',
+                category: 'mind',
+                title: '욱하는 마음 가라앉히기',
+                emoji: '🌋',
+                desc: '터지기 직전, 긴급 산소 공급',
+                keywords: ['욱해', '다혈질', '열받아', '화남', '운전', '분노', '폭발'],
+                method: '생리학적 한숨',
+                bg: '#fdf2f2',
+                focus: 'chest',
+                benefit: '두 번 나눠 마시고 길게 내쉬는 방식으로, 치솟은 흥분을 가장 빠르게 낮추는 것으로 알려진 호흡이에요.',
+                cycle: [
+                    {type: '깊게 마셔요', sec: 4, phase: 'in',  msg: '가슴을 활짝 펴고 마셔요'},
+                    {type: '한 번 더 흡!', sec: 1, phase: 'in',  msg: '짧게 조금 더 마셔요!'},
+                    {type: '길게 내뱉어요', sec: 10, phase: 'out', msg: '나쁜 기운이 발끝까지 빠져나가요'}
+                ]
+            },
+            {
+                id: 'anxious',
+                category: 'mind',
+                title: '불안한 마음 고요하게',
+                emoji: '🌊',
+                desc: '두근거림을 낮추는 평온한 리듬',
+                keywords: ['불안', '심장', '걱정', '초조', '두근', '공황', '떨려'],
+                method: '박스 평정심 호흡',
+                bg: '#f0f9ff',
+                focus: 'belly',
+                benefit: '4-4-4-4의 네모난 리듬이 심장 박동을 고르게 만들어 불안과 두근거림을 줄여줘요.',
+                cycle: [
+                    {type: '들이마셔요', sec: 4, phase: 'in',   msg: '고요한 공기가 들어옵니다'},
+                    {type: '멈추세요', sec: 4, phase: 'hold', msg: '마음의 평화를 묶어두세요'},
+                    {type: '내쉬세요', sec: 4, phase: 'out',  msg: '불안함이 안개처럼 사라집니다'},
+                    {type: '다시 멈춰요', sec: 4, phase: 'hold', msg: '고요함 속에 잠시 머무세요'}
+                ]
+            },
+            {
+                id: 'interview',
+                category: 'mind',
+                title: '중요한 순간 전 긴장 해소',
+                emoji: '💼',
+                desc: '실력 발휘를 위한 멘탈 리셋',
+                keywords: ['면접', '발표', '시험', '긴장', '취준', '떨림'],
+                method: '4-4-8 균형 호흡',
+                bg: '#f3f4f6',
+                focus: 'chest',
+                benefit: '날숨을 들숨의 두 배로 길게 가져가, 긴장으로 올라간 몸의 각성을 낮추고 침착함을 되찾아요.',
+                cycle: [
+                    {type: '자신감을 마셔요', sec: 4, phase: 'in',   msg: '나는 할 수 있다!'},
+                    {type: '안정을 유지해요', sec: 4, phase: 'hold', msg: '중심을 잡습니다'},
+                    {type: '긴장을 뱉어요', sec: 8, phase: 'out',  msg: '떨림을 멀리 보냅니다'}
+                ]
+            },
+            {
+                id: 'insomnia',
+                category: 'mind',
+                title: '잡생각 지우고 숙면하기',
+                emoji: '🌙',
+                desc: '오늘 하루의 스위치를 끄는 시간',
+                keywords: ['잠', '불면', '생각', '밤', '졸려', '수면', '잠안와'],
+                method: '4-7-8 수면 유도',
+                bg: '#f5f3ff',
+                focus: 'belly',
+                benefit: '길게 참고 더 길게 내쉬는 4-7-8 리듬이 몸을 이완시켜, 잠들기 쉬운 상태로 이끌어요.',
+                cycle: [
+                    {type: '천천히 마셔요', sec: 4, phase: 'in',   msg: '포근한 밤의 공기입니다'},
+                    {type: '깊게 멈춰요', sec: 7, phase: 'hold', msg: '몸이 바닥으로 가라앉습니다'},
+                    {type: '완전히 비워요', sec: 8, phase: 'out',  msg: '모든 생각을 비워냅니다'}
+                ]
+            },
+            {
+                id: 'burnout',
+                category: 'mind',
+                title: '지친 마음 다독임',
+                emoji: '🍂',
+                desc: '나를 위한 따뜻한 위로 한 모금',
+                keywords: ['지쳐', '우울', '무기력', '번아웃', '힘들어', '피곤', '피로'],
+                method: '공명 호흡',
+                bg: '#fff7ed',
+                focus: 'belly',
+                benefit: '들숨과 날숨을 같은 길이로 천천히 반복하면 몸과 마음의 리듬이 맞춰지며 균형을 되찾아요.',
+                cycle: [
+                    {type: '나를 사랑해요', sec: 5, phase: 'in',  msg: '충분히 잘하고 있어요'},
+                    {type: '나를 믿어요', sec: 5, phase: 'out', msg: '잠시 쉬어가도 괜찮아요'}
+                ]
+            },
+            {
+                id: 'breathless',
+                category: 'mind',
+                title: '숨이 차고 답답할 때',
+                emoji: '🌬️',
+                desc: '가쁜 숨을 천천히 고르게',
+                keywords: ['답답', '숨차', '헉헉', '숨막혀', '가슴답답'],
+                method: '입술 오므리기 호흡',
+                bg: '#ecfdf5',
+                focus: 'chest',
+                benefit: '입술을 오므려 천천히 내쉬면 숨길이 열린 상태로 유지되어, 가쁘고 얕은 숨이 편안해져요.',
+                cycle: [
+                    {type: '코로 마셔요', sec: 2, phase: 'in',  msg: '코로 가볍게 들이마셔요'},
+                    {type: '입술 오므려 후~', sec: 4, phase: 'out', msg: '촛불을 살살 끄듯 천천히 내쉬어요'}
+                ]
+            },
+            {
+                id: 'focus',
+                category: 'mind',
+                title: '집중이 필요할 때',
+                emoji: '🎯',
+                desc: '흩어진 정신을 한 곳으로 모으기',
+                keywords: ['집중', '산만', '공부', '멍해', '딴생각'],
+                method: '교호 호흡',
+                bg: '#f0fdf4',
+                focus: 'belly',
+                benefit: '좌우 콧구멍을 번갈아 쉬는 요가의 교호 호흡을 응용해, 잡념을 줄이고 집중력을 끌어올려요.',
+                cycle: [
+                    {type: '한쪽 코로 마셔요', sec: 4, phase: 'in',   msg: '오른쪽 코를 막고 왼쪽으로 스읍~'},
+                    {type: '잠시 멈춰요', sec: 2, phase: 'hold', msg: '정신이 또렷해집니다'},
+                    {type: '반대쪽으로 내쉬어요', sec: 6, phase: 'out',  msg: '왼쪽 코를 막고 오른쪽으로 후~'}
+                ]
+            }
+        ];
+
+        let selectedP = null;
+        let isActive = false;
+        let currentCycleCount = 0;
+        const targetCycles = 4;
+        let soundOn = true;
+
+        let calmRecords = [];
+        let calmChart = null;
+        let moodBefore = null;
+        let moodMode = 'before';
+
+        /* ─────────── 호흡 흐름 도형 가이드 (Canvas) ───────────
+           2단계 → 볼록렌즈 / 3단계 → 정삼각형(역방향) / 4단계 → 정사각형
+           도형 크기는 동일, 선의 이동 속도만 초에 따라 달라지며 흐름은 계속 순환 */
+        const FlowGuide = {
+            canvas: null, ctx: null,
+            W: 310, H: 260,
+            groups: [], geoms: [], stepMap: [], fillP: [],
+            active: null, rafId: null,
+
+            init() {
+                this.canvas = document.getElementById('tri-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = this.W * dpr;
+                this.canvas.height = this.H * dpr;
+                this.canvas.style.width = this.W + 'px';
+                this.canvas.style.height = this.H + 'px';
+                this.ctx.scale(dpr, dpr);
+            },
+
+            setup(p) {
+                if (!this.ctx) this.init();
+                const groups = [];
+                p.cycle.forEach((s, i) => {
+                    const g = groups[groups.length - 1];
+                    if (g && g.phase === s.phase) { g.secs.push(s.sec); g.stepIdx.push(i); }
+                    else groups.push({ phase: s.phase, secs: [s.sec], stepIdx: [i] });
+                });
+                this.groups = groups;
+                this.geoms = this.buildGeoms(groups.length);
+
+                this.stepMap = [];
+                groups.forEach((g, gi) => {
+                    const total = g.secs.reduce((a, b) => a + b, 0);
+                    let acc = 0;
+                    g.secs.forEach((sec, k) => {
+                        this.stepMap[g.stepIdx[k]] = { gi, t0: acc / total, t1: (acc + sec) / total };
+                        acc += sec;
+                    });
+                });
+
+                this.fillP = groups.map(() => 0);
+                this.active = null;
+                this.draw();
+            },
+
+            buildGeoms(n) {
+                const line = (a, b) => t => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+                const quad = (a, c, b) => t => ({
+                    x: (1 - t) * (1 - t) * a.x + 2 * (1 - t) * t * c.x + t * t * b.x,
+                    y: (1 - t) * (1 - t) * a.y + 2 * (1 - t) * t * c.y + t * t * b.y
+                });
+                const cx = 156;
+
+                if (n === 4) { // 정사각형 (한 변 116)
+                    const s = 116, top = 74;
+                    const TL = {x: cx - s/2, y: top}, TR = {x: cx + s/2, y: top};
+                    const BR = {x: cx + s/2, y: top + s}, BL = {x: cx - s/2, y: top + s};
+                    return [
+                        { pt: line(BL, TL), label: {x: BL.x - 10, y: top + s/2 + 6, align: 'right'} },
+                        { pt: line(TL, TR), label: {x: cx, y: top - 18, align: 'center'} },
+                        { pt: line(TR, BR), label: {x: TR.x + 10, y: top + s/2 + 6, align: 'left'} },
+                        { pt: line(BR, BL), label: {x: cx, y: top + s + 28, align: 'center'} }
+                    ];
+                }
+                if (n === 3) { // 정삼각형 (역방향, 한 변 132)
+                    const s = 132, h = s * Math.sqrt(3) / 2; // ≈114.3
+                    const top = 76;
+                    const A = {x: cx - s/2, y: top};        // 좌상단
+                    const B = {x: cx + s/2, y: top};        // 우상단
+                    const C = {x: cx, y: top + h};          // 아래 꼭짓점 (정중앙)
+                    return [
+                        { pt: line(C, A), label: {x: (C.x + A.x)/2 - 16, y: (C.y + A.y)/2 + 6, align: 'right'} },
+                        { pt: line(A, B), label: {x: cx, y: top - 18, align: 'center'} },
+                        { pt: line(B, C), label: {x: (B.x + C.x)/2 + 16, y: (B.y + C.y)/2 + 6, align: 'left'} }
+                    ];
+                }
+                // 볼록렌즈 (2단계)
+                const P0 = {x: cx, y: 204}, P1 = {x: cx, y: 62};
+                const CL = {x: cx - 90, y: 133}, CR = {x: cx + 90, y: 133};
+                return [
+                    { pt: quad(P0, CL, P1), label: {x: cx - 58, y: 138, align: 'right'} },
+                    { pt: quad(P1, CR, P0), label: {x: cx + 58, y: 138, align: 'left'} }
+                ];
+            },
+
+            startStep(stepIdx, durSec) {
+                const m = this.stepMap[stepIdx];
+                if (!m) return;
+                this.active = { ...m, start: performance.now(), dur: durSec * 1000 };
+                if (!this.rafId) this.loop();
+            },
+
+            loop() {
+                this.rafId = requestAnimationFrame(() => this.loop());
+                if (this.active) {
+                    const el = (performance.now() - this.active.start) / this.active.dur;
+                    const p = this.active.t0 + (this.active.t1 - this.active.t0) * Math.min(1, el);
+                    this.fillP[this.active.gi] = Math.max(this.fillP[this.active.gi], p);
+                    if (el >= 1) this.active = null;
+                }
+                this.draw();
+                if (!this.active) {
+                    cancelAnimationFrame(this.rafId);
+                    this.rafId = null;
+                }
+            },
+
+            resetCycle() {
+                this.fillP = this.groups.map(() => 0);
+                this.draw();
+            },
+
+            strokePath(ptFn, tEnd, color, width) {
+                if (tEnd <= 0) return;
+                const ctx = this.ctx;
+                ctx.beginPath();
+                const steps = 40;
+                for (let i = 0; i <= steps; i++) {
+                    const t = (i / steps) * tEnd;
+                    const p = ptFn(t);
+                    i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+                }
+                ctx.lineWidth = width;
+                ctx.strokeStyle = color;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+            },
+
+            phaseName(ph) {
+                return ph === 'in' ? '들숨▲' : ph === 'hold' ? '멈춤●' : '날숨▼';
+            },
+
+            draw() {
+                const ctx = this.ctx;
+                if (!ctx || !this.groups.length) return;
+                ctx.clearRect(0, 0, this.W, this.H);
+
+                this.geoms.forEach(g => this.strokePath(g.pt, 1, 'rgba(59,44,31,0.12)', 8));
+
+                this.groups.forEach((g, gi) => {
+                    if (this.fillP[gi] > 0) this.strokePath(this.geoms[gi].pt, this.fillP[gi], '#ff8a4c', 8);
+                });
+
+                if (this.active) {
+                    const el = Math.min(1, (performance.now() - this.active.start) / this.active.dur);
+                    const t = this.active.t0 + (this.active.t1 - this.active.t0) * el;
+                    const p = this.geoms[this.active.gi].pt(t);
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 9, 0, Math.PI * 2);
+                    ctx.fillStyle = '#fff';
+                    ctx.fill();
+                    ctx.lineWidth = 4.5;
+                    ctx.strokeStyle = '#3b2c1f';
+                    ctx.stroke();
+                }
+
+                this.geoms.forEach(g => {
+                    const v = g.pt(0);
+                    ctx.beginPath();
+                    ctx.arc(v.x, v.y, 5.5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#3b2c1f';
+                    ctx.fill();
+                });
+
+                ctx.font = "800 16px 'Pretendard Variable', Pretendard, sans-serif";
+                this.groups.forEach((g, gi) => {
+                    const lb = this.geoms[gi].label;
+                    const isNow = this.active && this.active.gi === gi;
+                    ctx.textAlign = lb.align;
+                    ctx.fillStyle = isNow ? '#f4702e' : '#3b2c1f';
+                    ctx.fillText(`${this.phaseName(g.phase)} ${g.secs.join('+')}초`, lb.x, lb.y);
+                });
+            }
+        };
+
+        /* ── 사운드 엔진 (Web Audio API) ── */
+        const SoundEngine = {
+            ctx: null, master: null, noiseBuf: null,
+            init() {
+                if (this.ctx) {
+                    if (this.ctx.state === 'suspended') this.ctx.resume();
+                    return;
+                }
+                const AC = window.AudioContext || window.webkitAudioContext;
+                if (!AC) return;
+                this.ctx = new AC();
+                this.master = this.ctx.createGain();
+                this.master.gain.value = 0.6;
+                this.master.connect(this.ctx.destination);
+                const len = this.ctx.sampleRate * 2;
+                this.noiseBuf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+                const data = this.noiseBuf.getChannelData(0);
+                let last = 0;
+                for (let i = 0; i < len; i++) {
+                    const white = Math.random() * 2 - 1;
+                    last = (last + 0.02 * white) / 1.02;
+                    data[i] = last * 3.5;
+                }
+            },
+            breath(direction, dur) {
+                if (!this.ctx || !soundOn) return;
+                const t = this.ctx.currentTime;
+                const isIn = direction === 'in';
+                const osc = this.ctx.createOscillator();
+                const oGain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(isIn ? 196 : 330, t);
+                osc.frequency.linearRampToValueAtTime(isIn ? 330 : 175, t + dur);
+                oGain.gain.setValueAtTime(0.0001, t);
+                oGain.gain.exponentialRampToValueAtTime(0.05, t + Math.min(0.8, dur * 0.3));
+                oGain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+                osc.connect(oGain).connect(this.master);
+                osc.start(t); osc.stop(t + dur + 0.1);
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = this.noiseBuf;
+                noise.loop = true;
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.Q.value = 0.7;
+                filter.frequency.setValueAtTime(isIn ? 400 : 1100, t);
+                filter.frequency.linearRampToValueAtTime(isIn ? 1100 : 300, t + dur);
+                const nGain = this.ctx.createGain();
+                nGain.gain.setValueAtTime(0.0001, t);
+                nGain.gain.exponentialRampToValueAtTime(0.09, t + Math.min(0.9, dur * 0.35));
+                nGain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+                noise.connect(filter).connect(nGain).connect(this.master);
+                noise.start(t); noise.stop(t + dur + 0.1);
+            },
+            hold(dur) {
+                if (!this.ctx || !soundOn) return;
+                const t = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const g = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 220;
+                g.gain.setValueAtTime(0.0001, t);
+                g.gain.exponentialRampToValueAtTime(0.018, t + 0.5);
+                g.gain.setValueAtTime(0.018, t + Math.max(0.5, dur - 0.4));
+                g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+                osc.connect(g).connect(this.master);
+                osc.start(t); osc.stop(t + dur + 0.1);
+            },
+            chime() {
+                if (!this.ctx || !soundOn) return;
+                [[523.25, 0], [783.99, 0.35]].forEach(([freq, delay]) => {
+                    const t = this.ctx.currentTime + delay;
+                    const osc = this.ctx.createOscillator();
+                    const g = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    g.gain.setValueAtTime(0.0001, t);
+                    g.gain.exponentialRampToValueAtTime(0.12, t + 0.03);
+                    g.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+                    osc.connect(g).connect(this.master);
+                    osc.start(t); osc.stop(t + 2);
+                });
+            },
+            fadeOut() {
+                if (!this.ctx) return;
+                const t = this.ctx.currentTime;
+                this.master.gain.cancelScheduledValues(t);
+                this.master.gain.setTargetAtTime(0, t, 0.1);
+            },
+            restore() {
+                if (!this.ctx) return;
+                const t = this.ctx.currentTime;
+                this.master.gain.cancelScheduledValues(t);
+                this.master.gain.setTargetAtTime(0.6, t, 0.05);
+            }
+        };
+
+        function toggleSound() {
+            soundOn = !soundOn;
+            document.getElementById('sound-btn').innerText = soundOn ? '🔊' : '🔇';
+            if (!soundOn) SoundEngine.fadeOut();
+            else SoundEngine.restore();
+        }
+
+        const moodDictionary = {
+            '피곤': 'burnout', '피로': 'burnout', '지쳐': 'burnout', '지친': 'burnout', '지친다': 'burnout', '지쳤어': 'burnout', '힘들': 'burnout', '무기력': 'burnout', '번아웃': 'burnout', '쉬고': 'burnout', '우울': 'burnout',
+            '화나': 'volatile-anger', '화남': 'volatile-anger', '화가나': 'volatile-anger', '화난다': 'volatile-anger', '화가난다': 'volatile-anger', '화났다': 'volatile-anger', '화가났다': 'volatile-anger', '짜증': 'volatile-anger', '짜증나': 'volatile-anger', '열받': 'volatile-anger', '욱해': 'volatile-anger', '욱하': 'volatile-anger', '분노': 'volatile-anger',
+            '울음': 'angry-child', '떼쓰': 'angry-child', '아이': 'angry-child', '속상': 'angry-child',
+            '불안': 'anxious', '불안해': 'anxious', '심장': 'anxious', '걱정': 'anxious', '초조': 'anxious', '두근': 'anxious', '공황': 'anxious', '무서': 'anxious', '무서워': 'anxious',
+            '긴장': 'interview', '긴장돼': 'interview', '긴장된다': 'interview', '면접': 'interview', '발표': 'interview', '시험': 'interview', '취준': 'interview', '떨려': 'interview', '떨림': 'interview',
+            '잠': 'insomnia', '불면': 'insomnia', '졸려': 'insomnia', '수면': 'insomnia', '잠안': 'insomnia', '잠안와': 'insomnia', '잠이안와': 'insomnia', '뒤척': 'insomnia',
+            '답답': 'breathless', '답답해': 'breathless', '숨차': 'breathless', '헉헉': 'breathless', '숨막': 'breathless',
+            '집중': 'focus', '산만': 'focus', '공부': 'focus', '멍해': 'focus', '딴생': 'focus', '몰입': 'focus',
+            '공명': 'resonance', '건강': 'resonance', '노화': 'resonance', '매일': 'resonance', '기본': 'resonance',
+            '아침': 'morning-energy', '깨우': 'morning-energy', '활력': 'morning-energy', '에너지': 'morning-energy',
+            '폐활': 'lung-capacity', '심폐': 'lung-capacity', '운동': 'lung-capacity', '지구력': 'lung-capacity'
+        };
+
+        function findPersona(val) {
+            val = (val || '').trim().replace(/\s+/g, '');
+            if (val.length < 1) return null;
+            
+            // 1. Dictionary partial match first (high priority)
+            for (const [key, id] of Object.entries(moodDictionary)) {
+                if (val.includes(key)) {
+                    return personas.find(p => p.id === id);
+                }
+            }
+            
+            // 2. Fallback to existing keyword matching
+            return personas.find(p => p.keywords.some(k => val.includes(k)));
+        }
+
+        function init() {
+            const healthList = document.getElementById('health-list');
+            const mindList = document.getElementById('persona-list');
+
+            healthList.innerHTML = '';
+            mindList.innerHTML = '';
+
+            personas.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'persona-card p-5 flex items-center gap-4';
+                card.onclick = () => openSession(p);
+                card.innerHTML = `
+                    <div class="emoji-chip" style="background:${p.bg}">${p.emoji}</div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-[17px] font-extrabold leading-snug">${p.title}</h3>
+                        <p class="text-[13.5px] font-semibold text-[#93816e] truncate">${p.desc}</p>
+                    </div>
+                    <div class="text-[#e0d3c2] text-xl font-black">›</div>
+                `;
+                
+                if (p.category === 'health') {
+                    healthList.appendChild(card);
+                } else {
+                    mindList.appendChild(card);
+                }
+            });
+
+            renderManual();
+            setupSearch();
+        }
+
+        function renderManual() {
+            const wrap = document.getElementById('manual-list');
+            wrap.innerHTML = '';
+            personas.forEach(p => {
+                const steps = p.cycle.map(s => `${s.type} <b>${s.sec}초</b>`).join(' → ');
+                const item = document.createElement('details');
+                item.className = 'manual-item';
+                item.innerHTML = `
+                    <summary><span>${p.emoji} ${p.title} <span class="text-[13px] text-[#c4b6a5] font-bold ml-1">${p.method}</span></span></summary>
+                    <div class="manual-body">
+                        <div class="mb-2">
+                            <span class="manual-tag">${p.focus === 'belly' ? '🎈 배호흡' : '🫁 가슴호흡'}</span>
+                            <span class="manual-tag">${p.category === 'health' ? '❤️ 건강 호흡' : '🧠 상황별 호흡'}</span>
+                            <span class="manual-tag">4회 반복</span>
+                        </div>
+                        <p class="mb-1">💡 <b>이럴 때:</b> ${p.desc}</p>
+                        <p class="mb-1">🔄 <b>방법:</b> ${steps}</p>
+                        <p>✨ <b>효과:</b> ${p.benefit}</p>
+                    </div>
+                `;
+                wrap.appendChild(item);
+            });
+        }
+
+        function submitSearch() {
+            const input = document.getElementById('mood-input');
+            const miss = document.getElementById('search-miss');
+            const found = findPersona(input.value);
+            if (found) {
+                openSession(found);
+            } else if (input.value.trim().length > 0) {
+                miss.classList.remove('hidden');
+            }
+        }
+
+        function setupSearch() {
+            const input = document.getElementById('mood-input');
+            const miss = document.getElementById('search-miss');
+
+            input.addEventListener('input', (e) => {
+                miss.classList.add('hidden');
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter') return;
+                submitSearch();
+            });
+        }
+
+        function openSession(p) {
+            selectedP = p;
+            isActive = false;
+            currentCycleCount = 0;
+            moodBefore = null;
+
+            const overlay = document.getElementById('session-overlay');
+            overlay.style.background = `linear-gradient(180deg, ${p.bg} 0%, #faf5ee 85%)`;
+            overlay.classList.remove('translate-y-full');
+
+            document.getElementById('session-title').innerText = p.title;
+            document.getElementById('session-method').innerText = p.method;
+            document.getElementById('focus-badge').innerText = p.focus === 'belly' ? '🎈 배호흡' : '🫁 가슴호흡';
+            resetUI();
+            FlowGuide.setup(p);
+
+            moodMode = 'before';
+            showMoodCheck("시작 전, 지금 마음 상태를 골라주세요!");
+        }
+
+        function showMoodCheck(prompt) {
+            setBubble(prompt);
+            document.getElementById('mood-check').classList.remove('hidden');
+        }
+
+        function pickMood(v) {
+            document.getElementById('mood-check').classList.add('hidden');
+            if (moodMode === 'before') {
+                moodBefore = v;
+                setBubble("좋아요! 준비되면 아래 시작 버튼을 눌러주세요.");
+            } else {
+                calmRecords.push({
+                    name: `${calmRecords.length + 1}회차·${selectedP.method}`,
+                    before: moodBefore,
+                    after: v
+                });
+                renderCalmChart();
+                setBubble(v > (moodBefore || 0) ? "마음이 한결 안정됐네요! 기록해뒀어요 💛" : "기록했어요. 필요하면 한 번 더 함께해요!");
+            }
+        }
+
+        function closeSession() {
+            isActive = false;
+            SoundEngine.fadeOut();
+            document.getElementById('session-overlay').classList.add('translate-y-full');
+        }
+
+        function setBubble(text) {
+            const bubble = document.getElementById('msg-bubble');
+            bubble.classList.remove('bubble-pop');
+            void bubble.offsetWidth;
+            bubble.innerText = text;
+            bubble.classList.add('bubble-pop');
+        }
+
+        function setStepLabel(text) {
+            const el = document.getElementById('current-step');
+            el.classList.remove('step-swap');
+            void el.offsetWidth;
+            el.innerText = text;
+            el.classList.add('step-swap');
+        }
+
+        function setBodyState(state) {
+            const body = document.getElementById('mallang-body');
+            body.classList.remove('inhaling', 'holding', 'exhaling');
+            if (state) body.classList.add(state);
+        }
+
+        function spawnPuffs(dur) {
+            const layer = document.getElementById('puff-layer');
+            const count = Math.min(4, Math.max(2, Math.round(dur / 2.5)));
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    if (!isActive) return;
+                    const puff = document.createElement('div');
+                    puff.className = 'puff';
+                    puff.style.setProperty('--puff-dur', (1.8 + Math.random()) + 's');
+                    puff.style.setProperty('--puff-x', (40 + Math.random() * 45) + 'px');
+                    puff.style.setProperty('--puff-y', (-30 - Math.random() * 40) + 'px');
+                    layer.appendChild(puff);
+                    setTimeout(() => puff.remove(), 3000);
+                }, i * (dur * 1000 / count) + 300);
+            }
+        }
+
+        function spawnHearts() {
+            const layer = document.getElementById('puff-layer');
+            ['💛', '🧡', '💛', '✨', '🧡'].forEach((em, i) => {
+                setTimeout(() => {
+                    const h = document.createElement('div');
+                    h.className = 'heart';
+                    h.innerText = em;
+                    h.style.left = (-60 + Math.random() * 120) + 'px';
+                    h.style.setProperty('--h-rot', (-20 + Math.random() * 40) + 'deg');
+                    layer.appendChild(h);
+                    setTimeout(() => h.remove(), 2000);
+                }, i * 180);
+            });
+        }
+
+        function resetUI() {
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('progress-text').innerText = '0%';
+            document.getElementById('current-step').innerText = "준비";
+            document.getElementById('step-timer').innerText = "0";
+            document.getElementById('cycle-badge').innerText = `0 / ${targetCycles}회`;
+            document.getElementById('session-btn').innerText = "호흡 시작";
+            document.getElementById('session-btn').disabled = false;
+            document.getElementById('session-btn').style.opacity = '1';
+            document.getElementById('mood-check').classList.add('hidden');
+
+            setBodyState(null);
+            const chest = document.getElementById('visual-chest');
+            const tummy = document.getElementById('visual-belly');
+            [chest, tummy].forEach(el => el.style.transition = 'transform 0.8s var(--breath-ease)');
+            chest.style.transform = "translateX(-50%) scale(1)";
+            tummy.style.transform = "translateX(-50%) scale(1)";
+        }
+
+        async function toggleBreathing() {
+            if (isActive) return;
+            isActive = true;
+            document.getElementById('mood-check').classList.add('hidden');
+            document.getElementById('session-btn').innerText = "진행 중...";
+            document.getElementById('session-btn').disabled = true;
+            document.getElementById('session-btn').style.opacity = '0.5';
+
+            SoundEngine.init();
+            SoundEngine.restore();
+
+            const chest = document.getElementById('visual-chest');
+            const tummy = document.getElementById('visual-belly');
+
+            while (currentCycleCount < targetCycles && isActive) {
+                FlowGuide.resetCycle();
+                document.getElementById('cycle-badge').innerText = `${currentCycleCount + 1} / ${targetCycles}회`;
+
+                for (let si = 0; si < selectedP.cycle.length; si++) {
+                    const step = selectedP.cycle[si];
+                    if (!isActive) break;
+
+                    const time = step.sec;
+                    setStepLabel(step.type);
+                    setBubble(step.msg);
+                    FlowGuide.startStep(si, time);
+
+                    const easing = step.phase === 'out' ? 'var(--deflate-ease)' : 'var(--breath-ease)';
+                    [chest, tummy].forEach(el => el.style.transition = `transform ${time}s ${easing}`);
+
+                    if (step.phase === 'in') {
+                        setBodyState('inhaling');
+                        if (selectedP.focus === 'belly') {
+                            tummy.style.transform = "translateX(-50%) scale(1.35)";
+                        } else {
+                            chest.style.transform = "translateX(-50%) scale(1.5, 1.7)";
+                        }
+                        SoundEngine.breath('in', time);
+                    } else if (step.phase === 'out') {
+                        setBodyState('exhaling');
+                        tummy.style.transform = "translateX(-50%) scale(1)";
+                        chest.style.transform = "translateX(-50%) scale(1)";
+                        spawnPuffs(time);
+                        SoundEngine.breath('out', time);
+                    } else {
+                        setBodyState('holding');
+                        SoundEngine.hold(time);
+                    }
+
+                    let remain = time;
+                    document.getElementById('step-timer').innerText = remain;
+                    await new Promise(resolve => {
+                        let itv = setInterval(() => {
+                            remain--;
+                            if (remain >= 0) document.getElementById('step-timer').innerText = remain;
+                            if (remain <= 0 || !isActive) {
+                                clearInterval(itv);
+                                resolve();
+                            }
+                        }, 1000);
+                    });
+                }
+                if (!isActive) break;
+                currentCycleCount++;
+                const prg = Math.round((currentCycleCount / targetCycles) * 100);
+                document.getElementById('progress-fill').style.width = prg + '%';
+                document.getElementById('progress-text').innerText = prg + '%';
+            }
+
+            if (currentCycleCount >= targetCycles) {
+                setBodyState(null);
+                setStepLabel("완료");
+                spawnHearts();
+                SoundEngine.chime();
+                document.getElementById('session-btn').innerText = "다시 하기";
+                document.getElementById('session-btn').disabled = false;
+                document.getElementById('session-btn').style.opacity = '1';
+                isActive = false;
+                currentCycleCount = 0;
+
+                moodMode = 'after';
+                showMoodCheck("정말 잘하셨어요! 지금 마음은 어떤가요?");
+            }
+        }
+
+        function renderCalmChart() {
+            const box = document.getElementById('calm-chart-box');
+            const empty = document.getElementById('calm-empty');
+            if (calmRecords.length === 0) {
+                box.classList.add('hidden');
+                empty.classList.remove('hidden');
+                return;
+            }
+            box.classList.remove('hidden');
+            empty.classList.add('hidden');
+
+            const moodEmoji = ['', '😖', '😕', '😐', '🙂', '😌'];
+            const labels = calmRecords.map(r => r.name);
+            const before = calmRecords.map(r => r.before);
+            const after = calmRecords.map(r => r.after);
+
+            if (calmChart) calmChart.destroy();
+            calmChart = new Chart(document.getElementById('calmChart'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: '호흡 전', data: before, backgroundColor: '#e2d8ca', borderRadius: 8 },
+                        { label: '호흡 후', data: after, backgroundColor: '#34d399', borderRadius: 8 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 0, max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                callback: v => moodEmoji[v] || '',
+                                font: { size: 18 }
+                            },
+                            grid: { color: '#f3ede3' }
+                        },
+                        x: { ticks: { font: { size: 12, weight: 'bold' } }, grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 14, weight: 'bold' } } },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `${ctx.dataset.label}: ${moodEmoji[ctx.raw] || '-'} (${ctx.raw ?? '기록 없음'})`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        let recognition = null;
+        let isListening = false;
+
+        function startVoiceRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return alert("이 브라우저는 음성 인식을 지원하지 않습니다.");
+
+            const micBtn = document.getElementById('mic-btn');
+            if (isListening) {
+                if (recognition) recognition.stop();
+                return;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.lang = 'ko-KR';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                isListening = true;
+                micBtn.innerText = '🔴';
+                micBtn.classList.add('animate-pulse-red');
+                micBtn.title = '듣고 있습니다... (클릭 시 중단)';
+            };
+
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                const input = document.getElementById('mood-input');
+                input.value = text;
+                input.dispatchEvent(new Event('input'));
+                input.focus();
+                
+                // Automatically submit/enter search
+                submitSearch();
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech recognition error", event.error);
+                cleanupVoiceRecognition();
+            };
+
+            recognition.onend = () => {
+                cleanupVoiceRecognition();
+            };
+
+            recognition.start();
+        }
+
+        function cleanupVoiceRecognition() {
+            isListening = false;
+            const micBtn = document.getElementById('mic-btn');
+            if (micBtn) {
+                micBtn.innerText = '🎤';
+                micBtn.classList.remove('animate-pulse-red');
+                micBtn.title = '음성으로 입력';
+            }
+        }
+                 /* ── 앰비언트 사운드 (ASMR) 엔진 (Web Audio API) ── */
+        const AsmrEngine = {
+            ctx: null,
+            sources: {},
+            gains: {},
+            currentSound: 'none',
+            masterVolume: 0.3,
+            isPlaying: false,
+
+            init() {
+                if (this.ctx) return;
+                const AC = window.AudioContext || window.webkitAudioContext;
+                if (!AC) return;
+                this.ctx = new AC();
+            },
+
+            setVolume(v) {
+                this.masterVolume = parseFloat(v);
+                if (this.ctx && this.sources[this.currentSound] && this.gains[this.currentSound]) {
+                    this.gains[this.currentSound].gain.setValueAtTime(this.masterVolume, this.ctx.currentTime);
+                }
+            },
+
+            play(type) {
+                this.init();
+                if (!this.ctx) return;
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                
+                this.stopCurrent();
+
+                if (type === 'none') {
+                    this.currentSound = 'none';
+                    this.isPlaying = false;
+                    return;
+                }
+
+                this.currentSound = type;
+                this.isPlaying = true;
+
+                const gainNode = this.ctx.createGain();
+                gainNode.gain.setValueAtTime(0, this.ctx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(this.masterVolume, this.ctx.currentTime + 1.5);
+                gainNode.connect(this.ctx.destination);
+                this.gains[type] = gainNode;
+
+                let source = null;
+                if (type === 'rain') {
+                    source = this.createRainSource(gainNode);
+                } else if (type === 'wave') {
+                    source = this.createWaveSource(gainNode);
+                } else if (type === 'forest') {
+                    source = this.createForestSource(gainNode);
+                }
+
+                if (source) {
+                    this.sources[type] = source;
+                }
+            },
+
+            stopCurrent() {
+                const prev = this.currentSound;
+                if (prev !== 'none' && this.sources[prev]) {
+                    const src = this.sources[prev];
+                    const gn = this.gains[prev];
+                    try {
+                        const t = this.ctx.currentTime;
+                        gn.gain.cancelScheduledValues(t);
+                        gn.gain.setValueAtTime(gn.gain.value, t);
+                        gn.gain.linearRampToValueAtTime(0, t + 0.8);
+                        setTimeout(() => {
+                            try {
+                                if (typeof src.stop === 'function') src.stop();
+                                else src.stop();
+                            } catch(e) {}
+                        }, 900);
+                    } catch(e) {
+                        try {
+                            if (typeof src.stop === 'function') src.stop();
+                            else src.stop();
+                        } catch(err) {}
+                    }
+                    delete this.sources[prev];
+                    delete this.gains[prev];
+                }
+                this.isPlaying = false;
+            },
+
+            createNoiseBuffer(type) {
+                const bufferSize = this.ctx.sampleRate * 4;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    if (type === 'pink') {
+                        b0 = 0.99886 * b0 + white * 0.0555179;
+                        b1 = 0.99332 * b1 + white * 0.0750759;
+                        b2 = 0.96900 * b2 + white * 0.1538520;
+                        b3 = 0.86650 * b3 + white * 0.3104856;
+                        b4 = 0.55000 * b4 + white * 0.5329522;
+                        b5 = -0.7616 * b5 - white * 0.0168980;
+                        data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+                        data[i] *= 0.11;
+                        b6 = white * 0.115926;
+                    } else {
+                        data[i] = white;
+                    }
+                }
+                return buffer;
+            },
+
+            createRainSource(dest) {
+                // 1. Drizzle (Lowpass pink noise)
+                const rainNode = this.ctx.createBufferSource();
+                rainNode.buffer = this.createNoiseBuffer('pink');
+                rainNode.loop = true;
+
+                const lp = this.ctx.createBiquadFilter();
+                lp.type = 'lowpass';
+                lp.frequency.value = 800;
+
+                rainNode.connect(lp).connect(dest);
+                rainNode.start();
+
+                // 2. Sharp leaf splatter (Highpass pink noise with low gain)
+                const leafNode = this.ctx.createBufferSource();
+                leafNode.buffer = this.createNoiseBuffer('pink');
+                leafNode.loop = true;
+
+                const hp = this.ctx.createBiquadFilter();
+                hp.type = 'highpass';
+                hp.frequency.value = 2500;
+                
+                const leafGain = this.ctx.createGain();
+                leafGain.gain.value = 0.08;
+
+                leafNode.connect(hp).connect(leafGain).connect(dest);
+                leafNode.start();
+
+                // 3. Drop clicks (procedural droplets)
+                const clickTimer = setInterval(() => {
+                    if (this.currentSound !== 'rain' || !this.isPlaying) {
+                        clearInterval(clickTimer);
+                        return;
+                    }
+                    try {
+                        const t = this.ctx.currentTime;
+                        const osc = this.ctx.createOscillator();
+                        const g = this.ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(1000 + Math.random() * 1500, t);
+                        
+                        g.gain.setValueAtTime(0.00001, t);
+                        g.gain.exponentialRampToValueAtTime(0.003 * Math.random(), t + 0.005);
+                        g.gain.exponentialRampToValueAtTime(0.00001, t + 0.03);
+
+                        osc.connect(g).connect(dest);
+                        osc.start();
+                        osc.stop(t + 0.04);
+                    } catch(e) {}
+                }, 40 + Math.random() * 40);
+
+                return {
+                    stop: () => {
+                        try { rainNode.stop(); } catch(e) {}
+                        try { leafNode.stop(); } catch(e) {}
+                        clearInterval(clickTimer);
+                    }
+                };
+            },
+
+            createWaveSource(dest) {
+                // Wave uses brown noise for deep water rumble and pink noise for foam splash
+                const deepNode = this.ctx.createBufferSource();
+                
+                // Let's create brown noise buffer dynamically
+                const brownBuffer = this.ctx.createBuffer(1, this.ctx.sampleRate * 4, this.ctx.sampleRate);
+                const brownData = brownBuffer.getChannelData(0);
+                let b0 = 0;
+                for (let i = 0; i < brownData.length; i++) {
+                    const white = Math.random() * 2 - 1;
+                    b0 = (b0 + 0.05 * white) / 1.05;
+                    brownData[i] = b0 * 2.5;
+                }
+                deepNode.buffer = brownBuffer;
+                deepNode.loop = true;
+
+                const deepLp = this.ctx.createBiquadFilter();
+                deepLp.type = 'lowpass';
+                deepLp.frequency.value = 210; // Modulated by LFO
+
+                const deepGain = this.ctx.createGain();
+                deepGain.gain.value = 0.425; // Modulated by LFO
+
+                deepNode.connect(deepLp).connect(deepGain).connect(dest);
+                deepNode.start();
+
+                // Foam node (Pink noise, bandpass filtered)
+                const foamNode = this.ctx.createBufferSource();
+                foamNode.buffer = this.createNoiseBuffer('pink');
+                foamNode.loop = true;
+
+                const foamBp = this.ctx.createBiquadFilter();
+                foamBp.type = 'bandpass';
+                foamBp.Q.value = 1.2;
+                foamBp.frequency.value = 900; // Modulated by LFO
+
+                const foamGain = this.ctx.createGain();
+                foamGain.gain.value = 0.065; // Modulated by LFO
+
+                foamNode.connect(foamBp).connect(foamGain).connect(dest);
+                foamNode.start();
+
+                // Native LFO Modulator (8 seconds period)
+                const lfo = this.ctx.createOscillator();
+                lfo.frequency.value = 0.125; // 0.125 Hz = 8s cycle
+
+                // LFO to Deep filter frequency (sweeps -110Hz to +110Hz around 210Hz => 100Hz to 320Hz)
+                const lfoDeepFreqGain = this.ctx.createGain();
+                lfoDeepFreqGain.gain.value = 110;
+                lfo.connect(lfoDeepFreqGain).connect(deepLp.frequency);
+
+                // LFO to Deep gain (sweeps -0.375 to +0.375 around 0.425 => 0.05 to 0.8)
+                const lfoDeepGainGain = this.ctx.createGain();
+                lfoDeepGainGain.gain.value = 0.375;
+                lfo.connect(lfoDeepGainGain).connect(deepGain.gain);
+
+                // LFO to Foam filter frequency (sweeps -500Hz to +500Hz around 900Hz => 400Hz to 1400Hz)
+                const lfoFoamFreqGain = this.ctx.createGain();
+                lfoFoamFreqGain.gain.value = 500;
+                lfo.connect(lfoFoamFreqGain).connect(foamBp.frequency);
+
+                // LFO to Foam gain (sweeps -0.055 to +0.055 around 0.065 => 0.01 to 0.12)
+                const lfoFoamGainGain = this.ctx.createGain();
+                lfoFoamGainGain.gain.value = 0.055;
+                lfo.connect(lfoFoamGainGain).connect(foamGain.gain);
+
+                lfo.start();
+
+                return {
+                    stop: () => {
+                        try { deepNode.stop(); } catch(e) {}
+                        try { foamNode.stop(); } catch(e) {}
+                        try { lfo.stop(); } catch(e) {}
+                    }
+                };
+            },
+
+            createForestSource(dest) {
+                // Forest is light wind (highpass filtered pink noise) + crickets + bird chirps
+                const windNode = this.ctx.createBufferSource();
+                windNode.buffer = this.createNoiseBuffer('pink');
+                windNode.loop = true;
+
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.Q.value = 1.0;
+                filter.frequency.value = 625; // Modulated by LFO
+
+                const windGain = this.ctx.createGain();
+                windGain.gain.value = 0.25;
+
+                windNode.connect(filter).connect(windGain).connect(dest);
+                windNode.start();
+
+                // Native LFO for wind variation (sweeps -225Hz to +225Hz around 625Hz => 400Hz to 850Hz)
+                const windLfo = this.ctx.createOscillator();
+                windLfo.frequency.value = 0.07; // 14 seconds period
+                const windLfoGain = this.ctx.createGain();
+                windLfoGain.gain.value = 225;
+                windLfo.connect(windLfoGain).connect(filter.frequency);
+                windLfo.start();
+
+                // Cricket sound generator (Dense cricket chatter in summer night)
+                const cricketNode = this.ctx.createBufferSource();
+                cricketNode.buffer = this.createNoiseBuffer('pink');
+                cricketNode.loop = true;
+
+                const cricketHp = this.ctx.createBiquadFilter();
+                cricketHp.type = 'highpass';
+                cricketHp.frequency.value = 4200; // Crisp high insect rub pitch
+
+                const cricketGain = this.ctx.createGain();
+                cricketGain.gain.value = 0.0;
+                cricketNode.connect(cricketHp).connect(cricketGain).connect(dest);
+                cricketNode.start();
+
+                // Modulate cricket gain rapidly at 35Hz to create "chirp-chirp-chirp" sound
+                let cricketTimer = setInterval(() => {
+                    if (this.currentSound !== 'forest' || !this.isPlaying) {
+                        clearInterval(cricketTimer);
+                        return;
+                    }
+                    try {
+                        const t = this.ctx.currentTime;
+                        // Periodic chirps - audible gain (0.06)
+                        cricketGain.gain.setValueAtTime(0.06, t);
+                        cricketGain.gain.setValueAtTime(0.0, t + 0.02);
+                        cricketGain.gain.setValueAtTime(0.06, t + 0.04);
+                        cricketGain.gain.setValueAtTime(0.0, t + 0.06);
+                        cricketGain.gain.setValueAtTime(0.06, t + 0.08);
+                        cricketGain.gain.setValueAtTime(0.0, t + 0.1);
+                    } catch(e) {}
+                }, 400); // Repeat chirping phrase every 400ms
+
+                // Bird chirping timer
+                let birdTimer = setInterval(() => {
+                    if (this.currentSound !== 'forest' || !this.isPlaying) {
+                        clearInterval(birdTimer);
+                        return;
+                    }
+                    // Occasional bird chirp (every 3-6s)
+                    if (Math.random() > 0.4) {
+                        try {
+                            const t = this.ctx.currentTime;
+                            // Make double/triple chirp (organic)
+                            const baseF = 1800 + Math.random() * 800;
+                            
+                            // Chirp 1
+                            const osc1 = this.ctx.createOscillator();
+                            const g1 = this.ctx.createGain();
+                            osc1.type = 'sine';
+                            osc1.frequency.setValueAtTime(baseF, t);
+                            osc1.frequency.exponentialRampToValueAtTime(baseF + 1000, t + 0.06);
+                            g1.gain.setValueAtTime(0.0001, t);
+                            g1.gain.exponentialRampToValueAtTime(0.015, t + 0.015);
+                            g1.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+                            osc1.connect(g1).connect(dest);
+                            osc1.start();
+                            osc1.stop(t + 0.07);
+
+                            // Chirp 2 (120ms later)
+                            setTimeout(() => {
+                                if (this.currentSound !== 'forest' || !this.isPlaying) return;
+                                try {
+                                    const t2 = this.ctx.currentTime;
+                                    const osc2 = this.ctx.createOscillator();
+                                    const g2 = this.ctx.createGain();
+                                    osc2.type = 'sine';
+                                    osc2.frequency.setValueAtTime(baseF + 200, t2);
+                                    osc2.frequency.exponentialRampToValueAtTime(baseF + 1200, t2 + 0.06);
+                                    g2.gain.setValueAtTime(0.0001, t2);
+                                    g2.gain.exponentialRampToValueAtTime(0.015, t2 + 0.015);
+                                    g2.gain.exponentialRampToValueAtTime(0.0001, t2 + 0.06);
+                                    osc2.connect(g2).connect(dest);
+                                    osc2.start();
+                                    osc2.stop(t2 + 0.07);
+                                } catch(e) {}
+                            }, 120);
+                        } catch(e) {}
+                    }
+                }, 3500);
+
+                return {
+                    stop: () => {
+                        try { windNode.stop(); } catch(e) {}
+                        try { cricketNode.stop(); } catch(e) {}
+                        try { windLfo.stop(); } catch(e) {}
+                        clearInterval(cricketTimer);
+                        clearInterval(birdTimer);
+                    }
+                };
+            }
+        };
+
+        function toggleAsmr(type) {
+            ['none', 'rain', 'wave', 'forest'].forEach(t => {
+                const el = document.getElementById(`asmr-${t}`);
+                if (el) el.classList.remove('active');
+            });
+            const activeEl = document.getElementById(`asmr-${type}`);
+            if (activeEl) activeEl.classList.add('active');
+
+            const statusEl = document.getElementById('asmr-status');
+            if (statusEl) {
+                if (type === 'none') statusEl.innerText = '꺼짐';
+                else if (type === 'rain') statusEl.innerText = '🌧️ 재생 중';
+                else if (type === 'wave') statusEl.innerText = '🌊 재생 중';
+                else if (type === 'forest') statusEl.innerText = '🌲 재생 중';
+            }
+
+            AsmrEngine.play(type);
+        }
+
+        function changeAsmrVol(v) {
+            AsmrEngine.setVolume(v);
+            const pct = Math.round((parseFloat(v) / 0.8) * 100);
+            const volText = document.getElementById('asmr-vol-text');
+            if (volText) volText.innerText = pct + '%';
+        }
+
+        /* ── 하단 탭 내비게이션 라우터 ── */
+        function switchTab(tabName) {
+            const home = document.getElementById('home-content');
+            const asmr = document.getElementById('asmr-content');
+            const manual = document.getElementById('manual-content');
+            const tabHome = document.getElementById('tab-home');
+            const tabAsmr = document.getElementById('tab-asmr');
+            const tabManual = document.getElementById('tab-manual');
+
+            if (home) home.classList.add('hidden');
+            if (asmr) asmr.classList.add('hidden');
+            if (manual) manual.classList.add('hidden');
+
+            if (tabHome) tabHome.classList.remove('active');
+            if (tabAsmr) tabAsmr.classList.remove('active');
+            if (tabManual) tabManual.classList.remove('active');
+
+            if (tabName === 'home') {
+                if (home) home.classList.remove('hidden');
+                if (tabHome) tabHome.classList.add('active');
+            } else if (tabName === 'asmr') {
+                if (asmr) asmr.classList.remove('hidden');
+                if (tabAsmr) tabAsmr.classList.add('active');
+            } else if (tabName === 'manual') {
+                if (manual) manual.classList.remove('hidden');
+                if (tabManual) tabManual.classList.add('active');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
