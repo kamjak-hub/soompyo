@@ -407,6 +407,25 @@
             font-weight: 900;
             box-shadow: 0 4px 10px rgba(217, 72, 15, 0.15) !important;
         }
+
+        .asmr-select {
+            height: 46px;
+            padding: 0 12px;
+            border-radius: 23px;
+            background: #fff;
+            border: 1px solid rgba(59, 44, 31, 0.06);
+            box-shadow: var(--soft-shadow);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 800;
+            color: #3b2c1f;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .asmr-select:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--soft-shadow-lg);
+        }
         .bubble-pop { animation: bubblePop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
         @keyframes bubblePop {
             0% { transform: scale(0.94); opacity: 0.4; }
@@ -669,57 +688,7 @@
             </section>
         </main>
 
-        <!-- 앰비언트 사운드 (ASMR) (별도 탭) -->
-        <main id="asmr-content" class="px-7 pt-8 space-y-12 pb-24 hidden">
-            <section class="text-center py-6">
-                <div class="inline-block p-4 bg-orange-50 rounded-full text-4xl mb-4 text-[#ff8a4c] animate-pulse">🎧</div>
-                <h2 class="text-2xl font-extrabold mb-2">앰비언트 사운드 (ASMR)</h2>
-                <p class="text-[#93816e] text-[15px] font-semibold leading-relaxed max-w-md mx-auto">
-                    호흡은 시각뿐만 아니라 청각과 결합했을 때 효과가 극대화됩니다. 마음에 평온을 더해줄 배경음을 골라보세요.
-                </p>
-            </section>
 
-            <!-- ASMR 컨트롤러 카드 -->
-            <section class="soft-card p-8 bg-gradient-to-r from-[#fffbf4] to-[#fffefc] border-l-4 !border-l-[#ff8a4c]">
-                <div class="flex items-center justify-between mb-6">
-                    <span class="text-sm font-extrabold text-[#93816e]" id="asmr-status">꺼짐</span>
-                    <span class="text-xs font-bold text-[#c4b6a5]">실시간 입체 음향</span>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <button onclick="toggleAsmr('none')" id="asmr-none" class="asmr-chip active flex items-center justify-center gap-2 py-4">
-                        <span>🔇</span> 끄기
-                    </button>
-                    <button onclick="toggleAsmr('rain')" id="asmr-rain" class="asmr-chip flex items-center justify-center gap-2 py-4">
-                        <span>🌧️</span> 빗소리
-                    </button>
-                    <button onclick="toggleAsmr('wave')" id="asmr-wave" class="asmr-chip flex items-center justify-center gap-2 py-4">
-                        <span>🌊</span> 파도 소리
-                    </button>
-                    <button onclick="toggleAsmr('forest')" id="asmr-forest" class="asmr-chip flex items-center justify-center gap-2 py-4">
-                        <span>🌲</span> 숲소리
-                    </button>
-                </div>
-                
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center text-xs text-[#93816e] font-extrabold">
-                        <span>배경음 볼륨</span>
-                        <span id="asmr-vol-text">30%</span>
-                    </div>
-                    <input type="range" id="asmr-vol" min="0" max="0.8" step="0.05" value="0.3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#ff8a4c]" oninput="changeAsmrVol(this.value)">
-                </div>
-            </section>
-
-            <!-- 명상 팁 카드 -->
-            <section class="soft-card p-6 bg-[#faf5ee] border border-dashed border-[#e2d8ca]">
-                <h4 class="font-extrabold text-[15px] mb-2">💡 사운드 활용 Tip</h4>
-                <ul class="text-[13.5px] font-semibold text-[#93816e] space-y-2 list-disc list-inside">
-                    <li>빗소리는 깊은 생각에 몰입하거나 잠을 잘 때 좋습니다.</li>
-                    <li>파도 소리는 들숨과 날숨의 리듬을 파도의 출렁임과 맞춰보세요.</li>
-                    <li>숲소리는 활기찬 아침이나 머리를 식히고 싶을 때 효과적입니다.</li>
-                </ul>
-            </section>
-        </main>
 
         <!-- 사용법 & 호흡법 매뉴얼 (별도 탭) -->
         <main id="manual-content" class="px-7 pt-8 space-y-12 pb-24 hidden">
@@ -762,11 +731,12 @@
 
                 <details class="manual-item mb-4" open>
                     <summary>🧭 앱 사용법</summary>
-                    <div class="manual-body">
-                        ① 위 입력창에 기분을 적거나(🎤 음성도 가능) Enter를 눌러 추천 호흡으로 이동해요. 카드를 직접 골라도 좋아요.<br>
-                        ② 시작 전 지금 마음 상태(😖~😌)를 하나 골라주세요.<br>
-                        ③ '호흡 시작'을 누르고, 오른쪽 도형을 따라 함께 숨을 쉬어요. 선이 움직이는 속도가 곧 숨의 속도예요.<br>
-                        ④ 4회 반복이 끝나면 다시 마음 상태를 골라요. 전/후 변화가 '나의 안정 변화 그래프'에 기록돼요.
+                    <div class="manual-body leading-relaxed space-y-2">
+                        <p>① 위 입력창에 기분을 검색하거나(🎤 음성 마이크 가능) 카드를 직접 골라 호흡 세션 화면을 엽니다.</p>
+                        <p>② 세션 화면 우상단에서 원하는 <b>배경 엠비언트 사운드</b>(빗소리, 파도 소리, 숲소리)와 효과음(🔊) 설정을 조절합니다.</p>
+                        <p>③ 준비가 끝나면 <b>[호흡 시작]</b> 버튼을 누르고, 가이드 원과 도형을 따라 함께 편안하게 호흡합니다. (세션 중에는 화면이 자동으로 꺼지지 않습니다.)</p>
+                        <p>④ 호흡이 모두 완료되면 현재 마음 상태(😖~😌)를 선택해 호흡 전/후 변화를 기록합니다. 기록된 데이터는 메인 화면 하단의 <b>'나의 안정 변화 그래프'</b>에서 한눈에 볼 수 있습니다.</p>
+                        <p>💡 <b>[숙면 호흡]</b>은 사용자가 '종료' 버튼을 누르기 전까지 편안해질 때까지 무한 반복되며, <b>[답답할 때 호흡]</b>은 4회 완료 시 추가로 4회를 더 연장할 수 있습니다.</p>
                     </div>
                 </details>
 
@@ -779,10 +749,6 @@
             <button onclick="switchTab('home')" id="tab-home" class="nav-tab active">
                 <span class="text-xl">🏠</span>
                 <span class="text-xs font-bold mt-1">홈</span>
-            </button>
-            <button onclick="switchTab('asmr')" id="tab-asmr" class="nav-tab">
-                <span class="text-xl">🎧</span>
-                <span class="text-xs font-bold mt-1">앰비언트</span>
             </button>
             <button onclick="switchTab('manual')" id="tab-manual" class="nav-tab">
                 <span class="text-xl">📖</span>
@@ -799,6 +765,12 @@
                     <p id="session-method" class="text-[15px] font-bold text-[#93816e]">호흡법 명칭</p>
                 </div>
                 <div class="flex items-center gap-2.5">
+                    <select id="session-asmr-select" onchange="changeSessionAsmr(this.value)" class="asmr-select" title="배경음 선택">
+                        <option value="none">🔇 배경음 없음</option>
+                        <option value="rain">🌧️ 빗소리</option>
+                        <option value="wave">🌊 파도 소리</option>
+                        <option value="forest">🌲 숲소리</option>
+                    </select>
                     <button id="sound-btn" onclick="toggleSound()" class="icon-btn">🔊</button>
                     <button onclick="closeSession()" class="icon-btn font-black">✕</button>
                 </div>
@@ -1324,7 +1296,7 @@
                 osc.frequency.setValueAtTime(isIn ? 196 : 330, t);
                 osc.frequency.linearRampToValueAtTime(isIn ? 330 : 175, t + dur);
                 oGain.gain.setValueAtTime(0.0001, t);
-                oGain.gain.exponentialRampToValueAtTime(0.05, t + Math.min(0.8, dur * 0.3));
+                oGain.gain.exponentialRampToValueAtTime(0.2, t + Math.min(0.8, dur * 0.3));
                 oGain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
                 osc.connect(oGain).connect(this.master);
                 osc.start(t); osc.stop(t + dur + 0.1);
@@ -1339,7 +1311,7 @@
                 filter.frequency.linearRampToValueAtTime(isIn ? 1100 : 300, t + dur);
                 const nGain = this.ctx.createGain();
                 nGain.gain.setValueAtTime(0.0001, t);
-                nGain.gain.exponentialRampToValueAtTime(0.09, t + Math.min(0.9, dur * 0.35));
+                nGain.gain.exponentialRampToValueAtTime(isIn ? 0.36 : 0.46, t + Math.min(0.9, dur * 0.35));
                 nGain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
                 noise.connect(filter).connect(nGain).connect(this.master);
                 noise.start(t); noise.stop(t + dur + 0.1);
@@ -1352,8 +1324,8 @@
                 osc.type = 'sine';
                 osc.frequency.value = 220;
                 g.gain.setValueAtTime(0.0001, t);
-                g.gain.exponentialRampToValueAtTime(0.018, t + 0.5);
-                g.gain.setValueAtTime(0.018, t + Math.max(0.5, dur - 0.4));
+                g.gain.exponentialRampToValueAtTime(0.07, t + 0.5);
+                g.gain.setValueAtTime(0.07, t + Math.max(0.5, dur - 0.4));
                 g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
                 osc.connect(g).connect(this.master);
                 osc.start(t); osc.stop(t + dur + 0.1);
@@ -1522,6 +1494,11 @@
             // 시작 전 감정 선택 삭제 -> 바로 시작 가능하도록 설정
             document.getElementById('mood-check').classList.add('hidden');
             setBubble("좋아요! 준비되면 아래 시작 버튼을 눌러주세요.");
+
+            // 배경음 드롭다운 초기화
+            const asmrSelect = document.getElementById('session-asmr-select');
+            if (asmrSelect) asmrSelect.value = 'none';
+            AsmrEngine.play('none');
         }
 
         function showMoodCheck(prompt) {
@@ -1549,6 +1526,7 @@
             isActive = false;
             SoundEngine.fadeOut();
             releaseWakeLock();
+            AsmrEngine.play('none');
             document.getElementById('session-overlay').classList.add('translate-y-full');
         }
 
@@ -2241,55 +2219,26 @@
             }
         };
 
-        function toggleAsmr(type) {
-            ['none', 'rain', 'wave', 'forest'].forEach(t => {
-                const el = document.getElementById(`asmr-${t}`);
-                if (el) el.classList.remove('active');
-            });
-            const activeEl = document.getElementById(`asmr-${type}`);
-            if (activeEl) activeEl.classList.add('active');
-
-            const statusEl = document.getElementById('asmr-status');
-            if (statusEl) {
-                if (type === 'none') statusEl.innerText = '꺼짐';
-                else if (type === 'rain') statusEl.innerText = '🌧️ 재생 중';
-                else if (type === 'wave') statusEl.innerText = '🌊 재생 중';
-                else if (type === 'forest') statusEl.innerText = '🌲 재생 중';
-            }
-
-            AsmrEngine.play(type);
-        }
-
-        function changeAsmrVol(v) {
-            AsmrEngine.setVolume(v);
-            const pct = Math.round((parseFloat(v) / 0.8) * 100);
-            const volText = document.getElementById('asmr-vol-text');
-            if (volText) volText.innerText = pct + '%';
+        function changeSessionAsmr(value) {
+            AsmrEngine.play(value);
         }
 
         /* ── 하단 탭 내비게이션 라우터 ── */
         function switchTab(tabName) {
             const home = document.getElementById('home-content');
-            const asmr = document.getElementById('asmr-content');
             const manual = document.getElementById('manual-content');
             const tabHome = document.getElementById('tab-home');
-            const tabAsmr = document.getElementById('tab-asmr');
             const tabManual = document.getElementById('tab-manual');
 
             if (home) home.classList.add('hidden');
-            if (asmr) asmr.classList.add('hidden');
             if (manual) manual.classList.add('hidden');
 
             if (tabHome) tabHome.classList.remove('active');
-            if (tabAsmr) tabAsmr.classList.remove('active');
             if (tabManual) tabManual.classList.remove('active');
 
             if (tabName === 'home') {
                 if (home) home.classList.remove('hidden');
                 if (tabHome) tabHome.classList.add('active');
-            } else if (tabName === 'asmr') {
-                if (asmr) asmr.classList.remove('hidden');
-                if (tabAsmr) tabAsmr.classList.add('active');
             } else if (tabName === 'manual') {
                 if (manual) manual.classList.remove('hidden');
                 if (tabManual) tabManual.classList.add('active');
