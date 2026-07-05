@@ -859,60 +859,63 @@
 
     <script>
         const personas = [
-            // ───────────────── 건강 호흡 ─────────────────
             {
                 id: 'resonance',
                 category: 'health',
                 title: '5-5 공명 호흡 (자율신경 균형)',
                 emoji: '🌱',
-                desc: '심장 박동과 호흡 리듬을 일치시킵니다',
+                desc: '심장 박동과 호흡 리듬을 일치시킵니다.',
                 keywords: ['공명', '건강', '노화', '자율신경', '균형', '안정', '매일', '면역', '체력', '회복'],
                 method: '5-5 공명 호흡',
                 bg: '#ecfdf5',
                 focus: 'belly',
-                benefit: '심장 박동과 호흡 리듬을 일치시켜 자율신경계를 가장 안정적인 상태로 만듭니다. 꾸준히 하면 노화 방지와 면역력 강화에 탁월합니다.',
+                benefit: '심장 박동과 호흡 리듬을 일치시켜 자율신경계를 가장 안정적인 상태로 만듭니다. 뇌와 심장이 동기화되도록 5분간 진득하게 몰입해 보세요.',
+                targetCount: 30,
+                inhale: 5, hold: 0, exhale: 5,
                 cycle: [
-                    {type: '천천히 마셔요', sec: 5, phase: 'in',  msg: '5초 동안 배를 부풀리며 코로 깊게 마셔요'},
-                    {type: '부드럽게 뱉어요', sec: 5, phase: 'out', msg: '5초 동안 온몸의 긴장을 풀며 입으로 내쉬어요'}
+                    {type: '들이쉬기', sec: 5, phase: 'in',  msg: '5초 동안 배를 부풀리며 코로 깊게 마셔요'},
+                    {type: '내쉬기', sec: 5, phase: 'out', msg: '5초 동안 온몸의 긴장을 풀며 입으로 내쉬어요'}
                 ]
             },
             {
-                id: 'morning-energy',
+                id: 'morning',
                 category: 'health',
                 title: '모닝 에너지 호흡 (세포 깨우기)',
                 emoji: '☀️',
                 desc: '뇌와 근육에 활력 가득한 에너지 충전',
                 keywords: ['아침', '에너지', '세포', '커피', '활력', '잠깨기', '피곤', '피로', '기상', '오전', '졸려'],
-                method: '4-2-4 활력 호흡',
+                method: '2-0-2 활력 호흡',
                 bg: '#fff9e6',
                 focus: 'chest',
-                benefit: '뇌와 온몸에 풍부한 산소를 신속하게 공급해 신체 온도를 높이고 아침잠을 깨우는 데 탁월한 호흡입니다.',
+                benefit: '뇌에 산소를 빠르게 공급합니다. 약간 빠른 템포로 기분 좋게 교감신경을 깨워보세요.',
+                targetCount: 20,
+                inhale: 2, hold: 0, exhale: 2,
                 cycle: [
-                    {type: '깊게 마셔요', sec: 4, phase: 'in',   msg: '가슴 가득 활기찬 공기를 들이마셔요!'},
-                    {type: '잠시 머금어요', sec: 2, phase: 'hold', msg: '산소가 온몸으로 전해집니다'},
-                    {type: '힘차게 뱉어요', sec: 4, phase: 'out',  msg: '이산화탄소를 힘차게 뿜어내며 날숨'}
+                    {type: '들이쉬기', sec: 2, phase: 'in',   msg: '2초 동안 가슴 가득 활기찬 공기를 들이마셔요'},
+                    {type: '내쉬기', sec: 2, phase: 'out',  msg: '2초 동안 이산화탄소를 힘차게 뿜어내며 날숨'}
                 ]
             },
             {
-                id: 'lung-capacity',
+                id: 'lung',
                 category: 'health',
                 title: '폐활량 강화 호흡 (심폐 지구력)',
                 emoji: '🫁',
                 desc: '가슴과 배를 동시에 확장하여 폐 전체 활성화',
                 keywords: ['폐활량', '강화', '심폐', '지구력', '달리기', '유산소', '운동', '가슴', '배', '산소'],
-                method: '6-4-6 완전 호흡',
+                method: '4-4-6 완전 호흡',
                 bg: '#f0f9ff',
                 focus: 'belly',
-                benefit: '배와 가슴을 모두 확장하여 폐포 구석구석까지 신선한 공기를 순환시킵니다. 심폐 기능 강화와 가슴이 답답할 때 아주 효과적입니다.',
+                benefit: '가슴과 배를 동시에 확장하는 폐 운동입니다. 10회 반복으로 횡격막을 충분히 스트레칭하세요.',
+                targetCount: 10,
+                inhale: 4, hold: 4, exhale: 6,
                 cycle: [
-                    {type: '가득 채우며 마셔요', sec: 6, phase: 'in',   msg: '배부터 가슴까지 폐 전체를 가득 채웁니다'},
-                    {type: '폐를 확장해 멈춰요', sec: 4, phase: 'hold', msg: '충만해진 공기를 폐 속에 머금으세요'},
-                    {type: '길고 고르게 비워내요', sec: 6, phase: 'out',  msg: '가슴부터 배 순서로 끝까지 완전히 내쉽니다'}
+                    {type: '들이쉬기', sec: 4, phase: 'in',   msg: '4초 동안 가슴과 배를 부풀리며 채워요'},
+                    {type: '멈추기', sec: 4, phase: 'hold', msg: '4초 동안 폐를 확장한 채로 멈춥니다'},
+                    {type: '내쉬기', sec: 6, phase: 'out',  msg: '6초 동안 부드럽게 끝까지 공기를 비워내요'}
                 ]
             },
-            // ───────────────── 상황별 호흡 ─────────────────
             {
-                id: 'angry-child',
+                id: 'child',
                 category: 'mind',
                 title: '화난 아이 달래기',
                 emoji: '🧸',
@@ -921,112 +924,125 @@
                 method: '풍선 복식 호흡',
                 bg: '#fff9e6',
                 focus: 'belly',
-                benefit: '풍선 불기 상상으로 흥분한 마음을 가라앉히고, 아이도 쉽게 따라 하는 복식 호흡 습관을 만들어요.',
+                benefit: '배가 빵빵해졌다가 꺼지는 리듬에 집중하며, 5회 안에 빠르게 안정을 찾도록 돕습니다.',
+                targetCount: 5,
+                inhale: 3, hold: 1, exhale: 4,
                 cycle: [
-                    {type: '코로 마셔요', sec: 5, phase: 'in',   msg: '예쁜 꽃향기를 배 속에 가득 채워요!'},
-                    {type: '잠시 멈춰요', sec: 3, phase: 'hold', msg: '좋은 기분을 간직해요'},
-                    {type: '입으로 뱉어요', sec: 8, phase: 'out',  msg: '속상한 기분을 멀리 후~ 날려요'}
+                    {type: '들이쉬기', sec: 3, phase: 'in',   msg: '3초 동안 예쁜 꽃향기를 들이마셔요'},
+                    {type: '멈추기', sec: 1, phase: 'hold', msg: '1초 동안 좋은 기분을 간직해요'},
+                    {type: '내쉬기', sec: 4, phase: 'out',  msg: '4초 동안 속상한 기분을 날려요'}
                 ]
             },
             {
-                id: 'volatile-anger',
+                id: 'angry',
                 category: 'mind',
                 title: '욱하는 마음 가라앉히기',
                 emoji: '🌋',
                 desc: '터지기 직전, 긴급 산소 공급',
                 keywords: ['욱해', '다혈질', '열받아', '화남', '운전', '분노', '폭발'],
-                method: '생리학적 한숨',
+                method: '분노 조절 호흡',
                 bg: '#fdf2f2',
                 focus: 'chest',
-                benefit: '두 번 나눠 마시고 길게 내쉬는 방식으로, 치솟은 흥분을 가장 빠르게 낮추는 것으로 알려진 호흡이에요.',
+                benefit: '분노 폭발 직전의 긴급 상황! \'딱 4번만 참아보자\'는 마음으로 박스 브리딩에 집중하세요.',
+                targetCount: 4,
+                inhale: 4, hold: 4, exhale: 4,
                 cycle: [
-                    {type: '깊게 마셔요', sec: 4, phase: 'in',  msg: '가슴을 활짝 펴고 마셔요'},
-                    {type: '한 번 더 흡!', sec: 1, phase: 'in',  msg: '짧게 조금 더 마셔요!'},
-                    {type: '길게 내뱉어요', sec: 10, phase: 'out', msg: '나쁜 기운이 발끝까지 빠져나가요'}
+                    {type: '들이쉬기', sec: 4, phase: 'in',  msg: '4초 동안 가슴을 펴고 차분하게 마셔요'},
+                    {type: '멈추기', sec: 4, phase: 'hold',  msg: '4초 동안 가만히 멈춰 감정을 다독입니다'},
+                    {type: '내쉬기', sec: 4, phase: 'out', msg: '4초 동안 후~ 하며 분노를 완전히 내보내요'}
                 ]
             },
             {
-                id: 'anxious',
+                id: 'anxiety',
                 category: 'mind',
                 title: '불안한 마음 고요하게',
                 emoji: '🌊',
                 desc: '두근거림을 낮추는 평온한 리듬',
                 keywords: ['불안', '심장', '걱정', '초조', '두근', '공황', '떨려'],
-                method: '박스 평정심 호흡',
+                method: '4-7-8 수면 안정 호흡',
                 bg: '#f0f9ff',
                 focus: 'belly',
-                benefit: '4-4-4-4의 네모난 리듬이 심장 박동을 고르게 만들어 불안과 두근거림을 줄여줘요.',
+                benefit: '전 세계가 검증한 4-7-8 호흡법입니다. 불안이 잦아드는 황금 비율인 6회 동안 차분해집니다.',
+                targetCount: 6,
+                inhale: 4, hold: 7, exhale: 8,
                 cycle: [
-                    {type: '들이마셔요', sec: 4, phase: 'in',   msg: '고요한 공기가 들어옵니다'},
-                    {type: '멈추세요', sec: 4, phase: 'hold', msg: '마음의 평화를 묶어두세요'},
-                    {type: '내쉬세요', sec: 4, phase: 'out',  msg: '불안함이 안개처럼 사라집니다'},
-                    {type: '다시 멈춰요', sec: 4, phase: 'hold', msg: '고요함 속에 잠시 머무세요'}
+                    {type: '들이쉬기', sec: 4, phase: 'in',   msg: '4초 동안 고요한 공기가 배 속으로 들어옵니다'},
+                    {type: '멈추기', sec: 7, phase: 'hold', msg: '7초 동안 평화를 가만히 머금으세요'},
+                    {type: '내쉬기', sec: 8, phase: 'out',  msg: '8초 동안 불안함이 모두 사라지도록 내쉽니다'}
                 ]
             },
             {
-                id: 'interview',
+                id: 'tension',
                 category: 'mind',
                 title: '중요한 순간 전 긴장 해소',
                 emoji: '💼',
                 desc: '실력 발휘를 위한 멘탈 리셋',
                 keywords: ['면접', '발표', '시험', '긴장', '취준', '떨림'],
-                method: '4-4-8 균형 호흡',
+                method: '5-2-5 긴장 해소 호흡',
                 bg: '#f3f4f6',
                 focus: 'chest',
-                benefit: '날숨을 들숨의 두 배로 길게 가져가, 긴장으로 올라간 몸의 각성을 낮추고 침착함을 되찾아요.',
+                benefit: '면접이나 발표 직전 멘탈 리셋! 5회 동안 밀도 있게 집중하여 긴장으로 굳은 어깨를 내려보세요.',
+                targetCount: 5,
+                inhale: 5, hold: 2, exhale: 5,
                 cycle: [
-                    {type: '자신감을 마셔요', sec: 4, phase: 'in',   msg: '나는 할 수 있다!'},
-                    {type: '안정을 유지해요', sec: 4, phase: 'hold', msg: '중심을 잡습니다'},
-                    {type: '긴장을 뱉어요', sec: 8, phase: 'out',  msg: '떨림을 멀리 보냅니다'}
+                    {type: '들이쉬기', sec: 5, phase: 'in',   msg: '5초 동안 마음을 가다듬으며 마셔요'},
+                    {type: '멈추기', sec: 2, phase: 'hold', msg: '2초 동안 중심을 다잡습니다'},
+                    {type: '내쉬기', sec: 5, phase: 'out',  msg: '5초 동안 모든 어깨 긴장을 풀고 후~'}
                 ]
             },
             {
-                id: 'insomnia',
+                id: 'sleep',
                 category: 'mind',
                 title: '잡생각 지우고 숙면하기',
                 emoji: '🌙',
                 desc: '오늘 하루의 스위치를 끄는 시간',
-                keywords: ['잠', '불면', '생각', '밤', '졸려', '수면', '잠안와'],
-                method: '4-7-8 수면 유도',
+                keywords: ['잠', '불면', '생각', '밤', '졸려', '수면', '잠안와', '잠이안와'],
+                method: '4-2-6 숙면 유도 호흡',
                 bg: '#f5f3ff',
                 focus: 'belly',
-                benefit: '길게 참고 더 길게 내쉬는 4-7-8 리듬이 몸을 이완시켜, 잠들기 쉬운 상태로 이끌어요.',
+                benefit: '잠들기 전 루틴입니다. 흐름이 깨지지 않게 횟수 제한 없이 스르륵 잠에 빠져들 때까지 지속됩니다.',
+                targetCount: 999,
+                inhale: 4, hold: 2, exhale: 6,
                 cycle: [
-                    {type: '천천히 마셔요', sec: 4, phase: 'in',   msg: '포근한 밤의 공기입니다'},
-                    {type: '깊게 멈춰요', sec: 7, phase: 'hold', msg: '몸이 바닥으로 가라앉습니다'},
-                    {type: '완전히 비워요', sec: 8, phase: 'out',  msg: '모든 생각을 비워냅니다'}
+                    {type: '들이쉬기', sec: 4, phase: 'in',   msg: '4초 동안 포근한 밤의 공기를 들이마셔요'},
+                    {type: '멈추기', sec: 2, phase: 'hold', msg: '2초 동안 몸이 차분히 가라앉는 걸 느낍니다'},
+                    {type: '내쉬기', sec: 6, phase: 'out',  msg: '6초 동안 모든 생각을 비워내며 길게 내쉽니다'}
                 ]
             },
             {
-                id: 'burnout',
+                id: 'comfort',
                 category: 'mind',
                 title: '지친 마음 다독임',
                 emoji: '🍂',
                 desc: '나를 위한 따뜻한 위로 한 모금',
                 keywords: ['지쳐', '우울', '무기력', '번아웃', '힘들어', '피곤', '피로'],
-                method: '공명 호흡',
+                method: '4-0-5 이완 호흡',
                 bg: '#fff7ed',
                 focus: 'belly',
-                benefit: '들숨과 날숨을 같은 길이로 천천히 반복하면 몸과 마음의 리듬이 맞춰지며 균형을 되찾아요.',
+                benefit: '오늘 하루 수고한 나에게 주는 위로입니다. 약 3분간 음악과 함께 마음의 피로를 환기하세요.',
+                targetCount: 12,
+                inhale: 4, hold: 0, exhale: 5,
                 cycle: [
-                    {type: '나를 사랑해요', sec: 5, phase: 'in',  msg: '충분히 잘하고 있어요'},
-                    {type: '나를 믿어요', sec: 5, phase: 'out', msg: '잠시 쉬어가도 괜찮아요'}
+                    {type: '들이쉬기', sec: 4, phase: 'in',  msg: '4초 동안 충분히 마셔요'},
+                    {type: '내쉬기', sec: 5, phase: 'out', msg: '5초 동안 잠시 쉬어가도 괜찮다고 되뇌며 내쉽니다'}
                 ]
             },
             {
-                id: 'breathless',
+                id: 'stuffy',
                 category: 'mind',
                 title: '숨이 차고 답답할 때',
                 emoji: '🌬️',
                 desc: '가쁜 숨을 천천히 고르게',
-                keywords: ['답답', '숨차', '헉헉', '숨막혀', '가슴답답'],
-                method: '입술 오므리기 호흡',
+                keywords: ['답답', '숨차', '헉헉', '숨막혀', '가슴답답', '답답해'],
+                method: '3-0-5 완화 호흡',
                 bg: '#ecfdf5',
                 focus: 'chest',
-                benefit: '입술을 오므려 천천히 내쉬면 숨길이 열린 상태로 유지되어, 가쁘고 얕은 숨이 편안해져요.',
+                benefit: '우선 가볍게 가쁜 숨을 고르는 4회로 시작합니다. 답답함이 남았다면 언제든 4회씩 연장할 수 있습니다.',
+                targetCount: 4,
+                inhale: 3, hold: 0, exhale: 5,
                 cycle: [
-                    {type: '코로 마셔요', sec: 2, phase: 'in',  msg: '코로 가볍게 들이마셔요'},
-                    {type: '입술 오므려 후~', sec: 4, phase: 'out', msg: '촛불을 살살 끄듯 천천히 내쉬어요'}
+                    {type: '들이쉬기', sec: 3, phase: 'in',  msg: '3초 동안 코로 천천히 가볍게 마셔요'},
+                    {type: '내쉬기', sec: 5, phase: 'out', msg: '5초 동안 입술을 오므리고 촛불을 끄듯 살살 붑니다'}
                 ]
             },
             {
@@ -1035,15 +1051,16 @@
                 title: '집중이 필요할 때',
                 emoji: '🎯',
                 desc: '흩어진 정신을 한 곳으로 모으기',
-                keywords: ['집중', '산만', '공부', '멍해', '딴생각'],
-                method: '교호 호흡',
+                keywords: ['집중', '산만', '공부', '멍해', '딴생각', '몰입'],
+                method: '4-0-4 균등 호흡',
                 bg: '#f0fdf4',
                 focus: 'belly',
-                benefit: '좌우 콧구멍을 번갈아 쉬는 요가의 교호 호흡을 응용해, 잡념을 줄이고 집중력을 끌어올려요.',
+                benefit: '일정한 박자의 균등 호흡으로 흐트러진 정신을 모아 뇌의 몰입도를 피크 상태로 끌어올립니다.',
+                targetCount: 15,
+                inhale: 4, hold: 0, exhale: 4,
                 cycle: [
-                    {type: '한쪽 코로 마셔요', sec: 4, phase: 'in',   msg: '오른쪽 코를 막고 왼쪽으로 스읍~'},
-                    {type: '잠시 멈춰요', sec: 2, phase: 'hold', msg: '정신이 또렷해집니다'},
-                    {type: '반대쪽으로 내쉬어요', sec: 6, phase: 'out',  msg: '왼쪽 코를 막고 오른쪽으로 후~'}
+                    {type: '들이쉬기', sec: 4, phase: 'in',   msg: '4초 동안 천천히 마셔요'},
+                    {type: '내쉬기', sec: 4, phase: 'out',  msg: '4초 동안 일정한 템포로 고르게 내쉬어요'}
                 ]
             }
         ];
@@ -1341,17 +1358,17 @@
         }
 
         const moodDictionary = {
-            '피곤': 'burnout', '피로': 'burnout', '지쳐': 'burnout', '지친': 'burnout', '지친다': 'burnout', '지쳤어': 'burnout', '힘들': 'burnout', '무기력': 'burnout', '번아웃': 'burnout', '쉬고': 'burnout', '우울': 'burnout',
-            '화나': 'volatile-anger', '화남': 'volatile-anger', '화가나': 'volatile-anger', '화난다': 'volatile-anger', '화가난다': 'volatile-anger', '화났다': 'volatile-anger', '화가났다': 'volatile-anger', '짜증': 'volatile-anger', '짜증나': 'volatile-anger', '열받': 'volatile-anger', '욱해': 'volatile-anger', '욱하': 'volatile-anger', '분노': 'volatile-anger',
-            '울음': 'angry-child', '떼쓰': 'angry-child', '아이': 'angry-child', '속상': 'angry-child',
-            '불안': 'anxious', '불안해': 'anxious', '심장': 'anxious', '걱정': 'anxious', '초조': 'anxious', '두근': 'anxious', '공황': 'anxious', '무서': 'anxious', '무서워': 'anxious',
-            '긴장': 'interview', '긴장돼': 'interview', '긴장된다': 'interview', '면접': 'interview', '발표': 'interview', '시험': 'interview', '취준': 'interview', '떨려': 'interview', '떨림': 'interview',
-            '잠': 'insomnia', '불면': 'insomnia', '졸려': 'insomnia', '수면': 'insomnia', '잠안': 'insomnia', '잠안와': 'insomnia', '잠이안와': 'insomnia', '뒤척': 'insomnia',
-            '답답': 'breathless', '답답해': 'breathless', '숨차': 'breathless', '헉헉': 'breathless', '숨막': 'breathless',
+            '피곤': 'comfort', '피로': 'comfort', '지쳐': 'comfort', '지친': 'comfort', '지친다': 'comfort', '지쳤어': 'comfort', '힘들': 'comfort', '무기력': 'comfort', '번아웃': 'comfort', '쉬고': 'comfort', '우울': 'comfort',
+            '화나': 'angry', '화남': 'angry', '화가나': 'angry', '화난다': 'angry', '화가난다': 'angry', '화났다': 'angry', '화가났다': 'angry', '짜증': 'angry', '짜증나': 'angry', '열받': 'angry', '욱해': 'angry', '욱하': 'angry', '분노': 'angry',
+            '울음': 'child', '떼쓰': 'child', '아이': 'child', '속상': 'child',
+            '불안': 'anxiety', '불안해': 'anxiety', '심장': 'anxiety', '걱정': 'anxiety', '초조': 'anxiety', '두근': 'anxiety', '공황': 'anxiety', '무서': 'anxiety', '무서워': 'anxiety',
+            '긴장': 'tension', '긴장돼': 'tension', '긴장된다': 'tension', '면접': 'tension', '발표': 'tension', '시험': 'tension', '취준': 'tension', '떨려': 'tension', '떨림': 'tension',
+            '잠': 'sleep', '불면': 'sleep', '졸려': 'sleep', '수면': 'sleep', '잠안': 'sleep', '잠안와': 'sleep', '잠이안와': 'sleep', '뒤척': 'sleep',
+            '답답': 'stuffy', '답답해': 'stuffy', '숨차': 'stuffy', '헉헉': 'stuffy', '숨막': 'stuffy',
             '집중': 'focus', '산만': 'focus', '공부': 'focus', '멍해': 'focus', '딴생': 'focus', '몰입': 'focus',
             '공명': 'resonance', '건강': 'resonance', '노화': 'resonance', '매일': 'resonance', '기본': 'resonance',
-            '아침': 'morning-energy', '깨우': 'morning-energy', '활력': 'morning-energy', '에너지': 'morning-energy',
-            '폐활': 'lung-capacity', '심폐': 'lung-capacity', '운동': 'lung-capacity', '지구력': 'lung-capacity'
+            '아침': 'morning', '깨우': 'morning', '활력': 'morning', '에너지': 'morning',
+            '폐활': 'lung', '심폐': 'lung', '운동': 'lung', '지구력': 'lung'
         };
 
         function findPersona(val) {
@@ -1555,7 +1572,15 @@
             document.getElementById('progress-text').innerText = '0%';
             document.getElementById('current-step').innerText = "준비";
             document.getElementById('step-timer').innerText = "0";
-            document.getElementById('cycle-badge').innerText = `0 / ${targetCycles}회`;
+            if (selectedP) {
+                if (selectedP.id === 'sleep') {
+                    document.getElementById('cycle-badge').innerText = `편안해질 때까지`;
+                } else {
+                    document.getElementById('cycle-badge').innerText = `0 / ${selectedP.targetCount}회`;
+                }
+            } else {
+                document.getElementById('cycle-badge').innerText = `0 / 4회`;
+            }
             document.getElementById('session-btn').innerText = "호흡 시작";
             document.getElementById('session-btn').disabled = false;
             document.getElementById('session-btn').style.opacity = '1';
@@ -1569,13 +1594,29 @@
             tummy.style.transform = "translateX(-50%) scale(1)";
         }
 
+        let isCompletedCleanly = false;
+
         async function toggleBreathing() {
-            if (isActive) return;
+            if (isActive) {
+                if (selectedP && selectedP.id === 'sleep') {
+                    isCompletedCleanly = true;
+                    isActive = false;
+                }
+                return;
+            }
             isActive = true;
+            isCompletedCleanly = false;
             document.getElementById('mood-check').classList.add('hidden');
-            document.getElementById('session-btn').innerText = "진행 중...";
-            document.getElementById('session-btn').disabled = true;
-            document.getElementById('session-btn').style.opacity = '0.5';
+            
+            if (selectedP.id === 'sleep') {
+                document.getElementById('session-btn').innerText = "종료";
+                document.getElementById('session-btn').disabled = false;
+                document.getElementById('session-btn').style.opacity = '1';
+            } else {
+                document.getElementById('session-btn').innerText = "진행 중...";
+                document.getElementById('session-btn').disabled = true;
+                document.getElementById('session-btn').style.opacity = '0.5';
+            }
 
             SoundEngine.init();
             SoundEngine.restore();
@@ -1583,9 +1624,14 @@
             const chest = document.getElementById('visual-chest');
             const tummy = document.getElementById('visual-belly');
 
-            while (currentCycleCount < targetCycles && isActive) {
+            while ((selectedP.id === 'sleep' || currentCycleCount < selectedP.targetCount) && isActive) {
                 FlowGuide.resetCycle();
-                document.getElementById('cycle-badge').innerText = `${currentCycleCount + 1} / ${targetCycles}회`;
+                
+                if (selectedP.id === 'sleep') {
+                    document.getElementById('cycle-badge').innerText = `편안해질 때까지`;
+                } else {
+                    document.getElementById('cycle-badge').innerText = `${currentCycleCount + 1} / ${selectedP.targetCount}회`;
+                }
 
                 for (let si = 0; si < selectedP.cycle.length; si++) {
                     const step = selectedP.cycle[si];
@@ -1633,12 +1679,35 @@
                 }
                 if (!isActive) break;
                 currentCycleCount++;
-                const prg = Math.round((currentCycleCount / targetCycles) * 100);
-                document.getElementById('progress-fill').style.width = prg + '%';
-                document.getElementById('progress-text').innerText = prg + '%';
+                
+                if (selectedP.id !== 'sleep') {
+                    const prg = Math.round((currentCycleCount / selectedP.targetCount) * 100);
+                    document.getElementById('progress-fill').style.width = prg + '%';
+                    document.getElementById('progress-text').innerText = prg + '%';
+                } else {
+                    document.getElementById('progress-fill').style.width = '100%';
+                    document.getElementById('progress-text').innerText = '∞';
+                }
+
+                // stuffy 호흡 연장 예외 처리
+                if (selectedP.id === 'stuffy' && currentCycleCount >= selectedP.targetCount) {
+                    const extend = await showExtendDialog();
+                    if (extend) {
+                        currentCycleCount = 0;
+                        document.getElementById('progress-fill').style.width = '0%';
+                        document.getElementById('progress-text').innerText = '0%';
+                        document.getElementById('cycle-badge').innerText = `0 / ${selectedP.targetCount}회`;
+                        setBubble("좋아요, 4회 더 호흡하며 답답함을 풀어내요.");
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+                    }
+                }
             }
 
-            if (currentCycleCount >= targetCycles) {
+            if (currentCycleCount >= selectedP.targetCount) {
+                isCompletedCleanly = true;
+            }
+
+            if (isCompletedCleanly) {
                 setBodyState(null);
                 setStepLabel("완료");
                 spawnHearts();
@@ -1651,6 +1720,8 @@
 
                 moodMode = 'after';
                 showMoodCheck("정말 잘하셨어요! 지금 마음은 어떤가요?");
+            } else {
+                resetUI();
             }
         }
 
@@ -2184,7 +2255,41 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        let extendResolver = null;
+
+        function showExtendDialog() {
+            document.getElementById('extend-popup').classList.remove('hidden');
+            return new Promise(resolve => {
+                extendResolver = resolve;
+            });
+        }
+
+        function handleExtendResponse(extend) {
+            document.getElementById('extend-popup').classList.add('hidden');
+            if (extendResolver) {
+                extendResolver(extend);
+                extendResolver = null;
+            }
+        }
+
         window.onload = init;
     </script>
+
+    <!-- 답답함 연장 팝업 -->
+    <div id="extend-popup" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm hidden p-6">
+        <div class="bg-white rounded-3xl p-7 max-w-sm w-full text-center shadow-2xl border border-gray-100">
+            <div class="text-4xl mb-3">🌬️</div>
+            <h3 class="text-xl font-extrabold mb-2 text-[#3b2c1f]">아직 답답함이 남아있나요?</h3>
+            <p class="text-[#93816e] text-sm font-semibold mb-6">원하시면 4회 더 호흡을 연장하여 가쁜 숨을 고를 수 있어요.</p>
+            <div class="flex gap-3">
+                <button onclick="handleExtendResponse(false)" class="flex-1 py-3.5 bg-gray-100 text-gray-700 font-bold rounded-2xl">
+                    완료하기
+                </button>
+                <button onclick="handleExtendResponse(true)" class="flex-1 py-3.5 cta-btn text-white font-bold rounded-2xl shadow-md">
+                    4회 연장하기
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
