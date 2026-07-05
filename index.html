@@ -745,7 +745,7 @@
         </main>
 
         <!-- 하단 내비게이션 바 -->
-        <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl bg-white/80 backdrop-blur-md border-t border-gray-100 flex items-center justify-around py-3 px-4 z-40 shadow-lg">
+        <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl bg-white/80 backdrop-blur-md border-t border-gray-100 flex items-center justify-around py-3 px-4 z-[60] shadow-lg" style="z-index: 999;">
             <button onclick="switchTab('home')" id="tab-home" class="nav-tab active">
                 <span class="text-xl">🏠</span>
                 <span class="text-xs font-bold mt-1">홈</span>
@@ -757,7 +757,7 @@
         </nav>
 
         <!-- 호흡 세션 레이어 -->
-        <div id="session-overlay" class="fixed inset-0 z-50 translate-y-full flex flex-col p-4 sm:p-7 overflow-y-auto sm:overflow-hidden" style="background: #faf5ee;">
+        <div id="session-overlay" class="fixed inset-0 z-50 translate-y-full flex flex-col pt-4 px-4 pb-20 sm:pt-7 sm:px-7 sm:pb-24 overflow-y-auto sm:overflow-hidden" style="background: #faf5ee;">
 
             <div class="flex justify-between items-center mb-3 sm:mb-5">
                 <div class="text-left">
@@ -2225,6 +2225,8 @@
 
         /* ── 하단 탭 내비게이션 라우터 ── */
         function switchTab(tabName) {
+            closeSession();
+
             const home = document.getElementById('home-content');
             const manual = document.getElementById('manual-content');
             const tabHome = document.getElementById('tab-home');
