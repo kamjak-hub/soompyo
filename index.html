@@ -1274,7 +1274,7 @@
                 if (!AC) return;
                 this.ctx = new AC();
                 this.master = this.ctx.createGain();
-                this.master.gain.value = 0.6;
+                this.master.gain.value = 0.78;
                 this.master.connect(this.ctx.destination);
                 const len = this.ctx.sampleRate * 2;
                 this.noiseBuf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
@@ -1285,6 +1285,19 @@
                     last = (last + 0.02 * white) / 1.02;
                     data[i] = last * 3.5;
                 }
+            },
+            bellChime() {
+                if (!this.ctx || !soundOn) return;
+                const t = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const g = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 1318.51; // High clear E6 bell note
+                g.gain.setValueAtTime(0.0001, t);
+                g.gain.exponentialRampToValueAtTime(0.18, t + 0.015);
+                g.gain.exponentialRampToValueAtTime(0.0001, t + 0.8);
+                osc.connect(g).connect(this.master);
+                osc.start(t); osc.stop(t + 1.0);
             },
             breath(direction, dur) {
                 if (!this.ctx || !soundOn) return;
@@ -1670,15 +1683,18 @@
                         } else {
                             chest.style.transform = "translateX(-50%) scale(1.5, 1.7)";
                         }
+                        SoundEngine.bellChime();
                         SoundEngine.breath('in', time);
                     } else if (step.phase === 'out') {
                         setBodyState('exhaling');
                         tummy.style.transform = "translateX(-50%) scale(1)";
                         chest.style.transform = "translateX(-50%) scale(1)";
                         spawnPuffs(time);
+                        SoundEngine.bellChime();
                         SoundEngine.breath('out', time);
                     } else {
                         setBodyState('holding');
+                        SoundEngine.bellChime();
                         SoundEngine.hold(time);
                     }
 
@@ -1860,7 +1876,7 @@
             sources: {},
             gains: {},
             currentSound: 'none',
-            masterVolume: 0.3,
+            masterVolume: 0.39,
             isPlaying: false,
 
             init() {
